@@ -1,0 +1,89 @@
+Question 7
+PROGRAM readStudentMAark
+BEGIN
+  LOOP student FROM 1 TO 3 STEP 1
+    numSubject = 0
+    totalMarks = 0
+    PRINT "Next Subject? (1 = yes 0 = no)"
+    READ choice
+    DOWHILE(choice == 1)
+      PRINT "Enter Mark"
+      READ mark
+      totalMarks = totalMarks + mark
+      numSubject = numSubject + 1
+      PRINT "Next Subject? (1 = yes 0 = no)"
+      READ choice
+    ENDDO
+    IF (numSubject > 0) THEN
+      averageMarks = totalMarks/numSubject
+      PRINT "Total is ", totalMarks
+      PRINT "Average is ", averageMarks
+    ELSE
+      PRINT "No Subject"
+    ENDIF
+    NEXT student
+  ENDLOOP
+END
+
+Question 8
+PROGRAM readStudentMAark
+BEGIN
+  PRINT "Next Student? (1 = yes 0 = no)"
+  READ isNextStudent
+  DOWHILE(isNextStudent == 1)
+    numSubject = 0
+    totalMarks = 0
+    PRINT "Next Subject? (1 = yes 0 = no)"
+    READ isNextSubject
+    DOWHILE(isNextSubject == 1)
+      PRINT "Enter Mark"
+      READ mark
+      totalMarks = totalMarks + mark
+      numSubject = numSubject + 1
+      PRINT "Next Subject? (1 = yes 0 = no)"
+      READ isNextSubject
+    ENDDO
+    IF (numSubject > 0) THEN
+      averageMarks = totalMarks/numSubject
+      PRINT "Total is ", totalMarks
+      PRINT "Average is ", averageMarks
+    ELSE
+      PRINT "No Subject"
+    ENDIF
+    PRINT "Next Student? (1 = yes 0 = no)"
+    READ isNextStudent
+  ENDDO
+END
+
+
+TUTORIAL 2
+QUESTION 1
+PROGRAM TrueDisk
+BEGIN
+  PRINT "Made Payment? (1 = yes 0 = no)"
+  READ isMadePayment
+  IF (isMadePayment == 1) THEN
+    PRINT "Paid Amount?"
+    READ paidAmount
+    finalAmount = 0
+    PRINT "How many days ago you made payment?"
+    READ paymentDay
+    IF (paymentDay <= 10) THEN
+      PRINT "You can get a Discount!"
+      IF (paidAmount > 1000) THEN
+        finalAmount = paidAmount * 0.96
+      ELSE IF (paidAmount >= 500 AND paidAmount <= 1000) THEN
+        finalAmount = paidAmount * 0.98
+      ELSE
+        PRINT "You cannot get any Discount because amount less than 500"
+        finalAmount = paidAmount
+      ENDIF
+    ELSE
+      PRINT "You cannot get any Discount!"
+      finalAmount = paidAmount
+    ENDIF
+    PRINT "Final Payment is", finalAmount
+  ELSE
+    PRINT "Please make payment 1st"
+  ENDIF
+END
