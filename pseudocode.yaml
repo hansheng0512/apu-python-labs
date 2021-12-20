@@ -87,3 +87,31 @@ BEGIN
     PRINT "Please make payment 1st"
   ENDIF
 END
+
+QUESTION 2
+PROGRAM Employee
+BEGIN
+  PRINT "Is Qualified? (1 = yes 0 = no)"
+  READ isQualified
+  PRINT "Experiences > 5 years? (1 = yes 0 = no)"
+  READ isExperienced
+  PRINT "Age > 30 years? (1 = yes 0 = no)"
+  READ age
+  IF (isQualified == 1 && isExperienced == 1 && age == 1) THEN
+    PRINT "Interview"
+  ELSE IF (isQualified == 1 && isExperienced == 1 && age == 0) THEN
+    PRINT "Interview"
+  ELSE IF (isQualified == 1 && isExperienced == 0 && age == 1) THEN
+    PRINT "Keep In File"
+  ELSE IF (isQualified == 1 && isExperienced == 0 && age == 0) THEN
+    PRINT "Keep In File"
+  ELSE IF (isQualified == 0 && isExperienced == 1 && age == 1) THEN
+    PRINT "Interview"
+  ELSE IF (isQualified == 0 && isExperienced == 1 && age == 0) THEN
+    PRINT "Keep In File"
+  ELSE IF (isQualified == 0 && isExperienced == 0 && age == 1) THEN
+    PRINT "Reject"
+  ELSE IF (isQualified == 0 && isExperienced == 0 && age == 0) THEN
+    PRINT "Reject"
+  ENDIF
+END
