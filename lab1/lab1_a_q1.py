@@ -1,0 +1,5 @@
+print("Welcome to student registration system")
+print("\t1. Register")
+print("\t2. Update")
+print("\t3. Delete")
+print("\t4. Exit")

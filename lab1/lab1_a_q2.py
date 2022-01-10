@@ -1,0 +1,13 @@
+name = input("Please enter your name: ")
+tpNum = input("Please enter your TP number: ")
+marks = input("Please enter your marks: ")
+grade = input("Please enter your grade: ")
+cgpa = input("Please enter your CGPA: ")
+
+print()
+print("Name: ", name)
+print("TP Number: ", tpNum)
+print("Marks: ", marks)
+print("Grade: ", grade)
+print("CGPA: ", cgpa)
+print("Thank you for registering.")
