@@ -1,5 +1,33 @@
+def supplier_login():
+    is_valid_supplier = True
+    while is_valid_supplier:
+        supplier_code = input("Please input supplier code: ")
+        if supplier_code != "":
+            supplier_file_object = open("supplier.txt", "r")
+            for supplier_details in supplier_file_object.readlines():
+                supplier_details = supplier_details.split(",")
+                raw_supplier_name = supplier_details[0]
+                raw_supplier_code = supplier_details[1].rstrip()
+                if supplier_code == raw_supplier_code:
+                    print("Supplier Found")
+                    return
+            print("Invalid Supplier")
+            continue_ask_research = True
+            while continue_ask_research:
+                break_process = input("Want to research? [0-no 1-yes]: ")
+                if break_process == "0" or break_process == "1":
+                    if break_process == "0":
+                        continue_ask_research = False
+                        is_valid_supplier = False
+                    else:
+                        continue_ask_research = False
+                else:
+                    continue_ask_research = True
+                    print("Invalid Input, only accept 0 and 1")
+
+
 def supplier_registration():
-    supplier_file_object = open("suppliers.txt", "w")
+    supplier_file_object = open("supplier.txt", "w")
     min_supplier = 3
     max_supplier = 4
     current_supplier = 1
@@ -12,7 +40,7 @@ def supplier_registration():
         if supplier_name == "":
             print("Invalid Supplier Name")
         if supplier_name != "" and supplier_code != "":
-            supplier_file_object.write("{}, {}".format(supplier_name, supplier_code))
+            supplier_file_object.write("{},{}".format(supplier_name, supplier_code))
             supplier_file_object.write("\n")
         if current_supplier == min_supplier:
             continue_ask_confirm = True
@@ -43,7 +71,7 @@ def initial_inventory_creation():
         if item_code == "":
             print("Invalid Supplier Code")
         if item_code != "" and supplier_code != "":
-            ppe_file_object.write("{}, {}, {}".format(item_code, supplier_code, 100))
+            ppe_file_object.write("{},{},{}".format(item_code, supplier_code, 100))
             ppe_file_object.write("\n")
         continue_ask_confirm = True
         while continue_ask_confirm:
@@ -62,5 +90,6 @@ def initial_inventory_creation():
 
 
 if __name__ == "__main__":
-    supplier_registration()
+    supplier_login()
+    # supplier_registration()
     # initial_inventory_creation()
