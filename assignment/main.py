@@ -123,11 +123,11 @@ def supplier_login():
             for supplier_details in supplier_file_object.readlines():
                 supplier_details = supplier_details.rstrip()
                 supplier_details = supplier_details.split(",")
-                raw_supplier_name = supplier_details[0]
-                raw_supplier_code = supplier_details[1].rstrip()
+                raw_supplier_name = supplier_details[1]
+                raw_supplier_code = supplier_details[0]
                 if supplier_code == raw_supplier_code:
                     print("Supplier Found")
-                    return
+                    return supplier_code, raw_supplier_name
             print("Invalid Supplier")
             continue_ask_research = True
             while continue_ask_research:
@@ -157,7 +157,7 @@ def supplier_registration():
         if supplier_name == "":
             print("Invalid Supplier Name")
         if supplier_name != "" and supplier_code != "":
-            supplier_file_object.write("{},{}".format(supplier_name, supplier_code))
+            supplier_file_object.write("{},{}".format(supplier_code, supplier_name))
             supplier_file_object.write("\n")
         if current_supplier == min_supplier:
             continue_ask_confirm = True
@@ -240,11 +240,10 @@ def initial_inventory_creation():
     ppe_file_object.close()
 
 
-def add_item_to_inventory():
+def add_item_to_inventory(supplier_code):
     ppe_file_object = open("ppe.txt", "a")
     add_item = True
     while add_item:
-        supplier_code = input("Enter Supplier Code: ")
         if supplier_code == "":
             print("Invalid Supplier Code")
             continue
@@ -285,11 +284,10 @@ def add_item_to_inventory():
     ppe_file_object.close()
 
 
-def distribution_module():
+def distribution_module(supplier_code):
     distribution_file_object = open("distribution.txt", "a")
     distribute_item = True
     while distribute_item:
-        supplier_code = input("Enter Supplier Code: ")
         while True:
             if supplier_code == "":
                 print("Supplier Code cannot be empty")
@@ -364,7 +362,42 @@ def distribution_module():
     distribution_file_object.close()
 
 if __name__ == "__main__":
-    distribution_module()
+    print("---Inventory System by Draden---")
+    print("\t1. Supplier Registration")
+    print("\t2. Hospital Registration")
+    print("\t3. Supplier Login")
+    option = input("Enter Option: ")
+    try:
+        option = int(option)
+    except:
+        print("Option must be a number")
+        exit()
+
+    if option == 1:
+        supplier_registration()
+    elif option == 2:
+        hospital_registration()
+    elif option == 3:
+        supplier_code, supplier_name = supplier_login()
+        print("---Welcome {}, Code: {}---".format(supplier_name, supplier_code))
+        print("\t1. Add Stock")
+        print("\t2. Distribute Stock to Hospital")
+        option = input("Enter Option: ")
+        try:
+            option = int(option)
+        except:
+            print("Option must be a number")
+            exit()
+        if option == 1:
+            add_item_to_inventory(supplier_code)
+        elif option == 2:
+            distribution_module(supplier_code)
+
+    else:
+        print("bye")
+
+
+
     # hospital_registration()
     # update_item_quantity()
     # add_item_to_inventory()
