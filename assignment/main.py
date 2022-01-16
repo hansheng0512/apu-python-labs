@@ -63,6 +63,39 @@ def supplier_registration():
     supplier_file_object.close()
 
 
+def hospital_registration():
+    hospital_file_object = open("hospital.txt", "w")
+    min_hospital = 3
+    max_hospital = 4
+    current_hospital = 1
+    while current_hospital <= max_hospital:
+        hospital_code = input("Enter Hospital Code: ")
+        if hospital_code == "":
+            print("Invalid Hospital Code")
+            continue
+        hospital_name = input("Enter Hospital Name: ")
+        if hospital_name == "":
+            print("Invalid Hospital Name")
+        if hospital_name != "" and hospital_code != "":
+            hospital_file_object.write("{},{}".format(hospital_name, hospital_code))
+            hospital_file_object.write("\n")
+        if current_supplier == min_hospital:
+            continue_ask_confirm = True
+            while continue_ask_confirm:
+                break_process = input("Want to add 4th hospital? [0-no 1-yes]: ")
+                if break_process == "0" or break_process == "1":
+                    if break_process == "0":
+                        continue_ask_confirm = False
+                        current_supplier = 5
+                    else:
+                        continue_ask_confirm = False
+                else:
+                    continue_ask_confirm = True
+                    print("Invalid Input, only accept 0 and 1")
+        current_supplier += 1
+    hospital_file_object.close()
+
+
 def initial_inventory_creation():
     ppe_file_object = open("ppe.txt", "w")
     add_item = True
@@ -218,6 +251,7 @@ def update_item_quantity():
         temp_ppe_file_object.write("\n")
     temp_ppe_file_object.close()
     os.rename("temp_ppe.txt", "ppe.txt")
+
 
 if __name__ == "__main__":
     update_item_quantity()
