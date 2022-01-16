@@ -79,20 +79,20 @@ def hospital_registration():
         if hospital_name != "" and hospital_code != "":
             hospital_file_object.write("{},{}".format(hospital_name, hospital_code))
             hospital_file_object.write("\n")
-        if current_supplier == min_hospital:
+        if current_hospital == min_hospital:
             continue_ask_confirm = True
             while continue_ask_confirm:
                 break_process = input("Want to add 4th hospital? [0-no 1-yes]: ")
                 if break_process == "0" or break_process == "1":
                     if break_process == "0":
                         continue_ask_confirm = False
-                        current_supplier = 5
+                        current_hospital = 5
                     else:
                         continue_ask_confirm = False
                 else:
                     continue_ask_confirm = True
                     print("Invalid Input, only accept 0 and 1")
-        current_supplier += 1
+        current_hospital += 1
     hospital_file_object.close()
 
 
@@ -253,8 +253,13 @@ def update_item_quantity():
     os.rename("temp_ppe.txt", "ppe.txt")
 
 
+# def distribution_module():
+
+
+
 if __name__ == "__main__":
-    update_item_quantity()
+    hospital_registration()
+    # update_item_quantity()
     # add_item_to_inventory()
     # supplier_login()
     # supplier_registration()
