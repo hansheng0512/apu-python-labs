@@ -274,6 +274,7 @@ def distribution_module():
 
 
 if __name__ == "__main__":
+    distribution_module()
     # hospital_registration()
     # update_item_quantity()
     # add_item_to_inventory()
