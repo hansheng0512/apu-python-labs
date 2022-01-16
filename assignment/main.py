@@ -69,9 +69,55 @@ def initial_inventory_creation():
             continue
         item_code = input("Enter Item Code: ")
         if item_code == "":
-            print("Invalid Supplier Code")
+            print("Invalid Item Code")
+            continue
         if item_code != "" and supplier_code != "":
-            ppe_file_object.write("{},{},{}".format(item_code, supplier_code, 100))
+            ppe_file_object.write("{},{},{}".format(supplier_code, item_code, 100))
+            ppe_file_object.write("\n")
+        continue_ask_confirm = True
+        while continue_ask_confirm:
+            break_process = input("Want to add next item? [0-no 1-yes]: ")
+            if break_process == "0" or break_process == "1":
+                if break_process == "0":
+                    continue_ask_confirm = False
+                    add_item = False
+                else:
+                    continue_ask_confirm = False
+                    add_item = True
+            else:
+                continue_ask_confirm = True
+                print("Invalid Input, only accept 0 and 1")
+    ppe_file_object.close()
+
+
+def add_item_to_inventory():
+    ppe_file_object = open("ppe.txt", "a")
+    add_item = True
+    while add_item:
+        supplier_code = input("Enter Supplier Code: ")
+        if supplier_code == "":
+            print("Invalid Supplier Code")
+            continue
+        item_code = input("Enter New Item Code: ")
+        if item_code == "":
+            print("Invalid Item Code")
+            continue
+        item_quantity = input("Enter New Item Quantity: ")
+        if item_quantity == "":
+            print("Invalid Item Quantity")
+            continue
+        else:
+            quantity_is_string = True
+            while quantity_is_string:
+                try:
+                    item_quantity = int(item_quantity)
+                    quantity_is_string = False
+                except:
+                    print("Item Quantity must be a number")
+                    item_quantity = input("Enter New Item Quantity: ")
+
+        if item_code != "" and supplier_code != "" and item_quantity != "":
+            ppe_file_object.write("{},{},{}".format(supplier_code, item_code, item_quantity))
             ppe_file_object.write("\n")
         continue_ask_confirm = True
         while continue_ask_confirm:
@@ -90,6 +136,7 @@ def initial_inventory_creation():
 
 
 if __name__ == "__main__":
-    supplier_login()
+    add_item_to_inventory()
+    # supplier_login()
     # supplier_registration()
     # initial_inventory_creation()
