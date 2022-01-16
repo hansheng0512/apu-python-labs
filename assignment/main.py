@@ -1,3 +1,6 @@
+import os
+
+
 def supplier_login():
     is_valid_supplier = True
     while is_valid_supplier:
@@ -5,6 +8,7 @@ def supplier_login():
         if supplier_code != "":
             supplier_file_object = open("supplier.txt", "r")
             for supplier_details in supplier_file_object.readlines():
+                supplier_details = supplier_details.rstrip()
                 supplier_details = supplier_details.split(",")
                 raw_supplier_name = supplier_details[0]
                 raw_supplier_code = supplier_details[1].rstrip()
@@ -135,8 +139,89 @@ def add_item_to_inventory():
     ppe_file_object.close()
 
 
+def update_item_quantity():
+    initial_item_list = []
+    initial_ppe_file_object = open("ppe.txt", "r")
+    temp_ppe_file_object = open("temp_ppe.txt", "w")
+    update_item = True
+
+    for initial_item_details in initial_ppe_file_object:
+        initial_item_details = initial_item_details.rstrip()
+        initial_item_details = initial_item_details.split(",")
+        initial_item_list.append({
+            "supplier_code": initial_item_details[0],
+            "item_code": initial_item_details[1],
+            "item_quantity": initial_item_details[2]
+        })
+    initial_ppe_file_object.close()
+
+    while update_item:
+        edited_item_list = []
+        supplier_code = input("Enter Supplier Code: ")
+        if supplier_code == "":
+            print("Invalid Supplier Code")
+            continue
+        item_code = input("Enter Item Code: ")
+        if item_code == "":
+            print("Invalid Item Code")
+            continue
+        is_item_found = False
+        for initial_item_details in initial_item_list:
+            if initial_item_details["supplier_code"] == supplier_code and initial_item_details["item_code"] == item_code:
+                is_item_found = True
+                break
+        if not is_item_found:
+            print("Invalid Supplier Code or Item Code")
+            continue
+        item_quantity = input("Enter New Item Quantity: ")
+        if item_quantity == "":
+            print("Invalid Item Quantity")
+            continue
+        else:
+            quantity_is_string = True
+            while quantity_is_string:
+                try:
+                    item_quantity = int(item_quantity)
+                    quantity_is_string = False
+                except:
+                    print("Item Quantity must be a number")
+                    item_quantity = input("Enter New Item Quantity: ")
+        if item_code != "" and supplier_code != "" and item_quantity != "" and not quantity_is_string:
+            for initial_item_details in initial_item_list:
+                if initial_item_details["supplier_code"] == supplier_code and initial_item_details["item_code"] == item_code:
+                    edited_item_list.append({
+                        "supplier_code": supplier_code,
+                        "item_code": item_code,
+                        "item_quantity": item_quantity
+                    })
+                else:
+                    edited_item_list.append({
+                        "supplier_code": initial_item_details["supplier_code"],
+                        "item_code": initial_item_details["item_code"],
+                        "item_quantity": initial_item_details["item_quantity"]
+                    })
+        continue_ask_confirm = True
+        while continue_ask_confirm:
+            break_process = input("Want to edit next item? [0-no 1-yes]: ")
+            if break_process == "0" or break_process == "1":
+                if break_process == "0":
+                    continue_ask_confirm = False
+                    update_item = False
+                else:
+                    continue_ask_confirm = False
+                    update_item = True
+            else:
+                continue_ask_confirm = True
+                print("Invalid Input, only accept 0 and 1")
+    for edited_item_details in edited_item_list:
+        temp_ppe_file_object.write("{},{},{}".format(edited_item_details["supplier_code"], edited_item_details["item_code"], edited_item_details["item_quantity"]))
+        temp_ppe_file_object.write("\n")
+    temp_ppe_file_object.close()
+    os.rename("temp_ppe.txt", "ppe.txt")
+
 if __name__ == "__main__":
-    add_item_to_inventory()
+    update_item_quantity()
+    # add_item_to_inventory()
     # supplier_login()
     # supplier_registration()
     # initial_inventory_creation()
