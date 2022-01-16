@@ -1,6 +1,26 @@
 import os
 
 
+def check_is_supplier_code_valid(supplier_code):
+    supplier_file_object = open("supplier.txt", "r")
+    for supplier_details in supplier_file_object:
+        supplier_details = supplier_details.rstrip()
+        supplier_details = supplier_details.split(",")
+        if supplier_details[0] == supplier_code:
+            return True
+    return False
+
+
+def check_is_hospital_code_valid(hospital_code):
+    hospital_file_object = open("hospital.txt", "r")
+    for hospital_details in hospital_file_object:
+        hospital_details = hospital_details.rstrip()
+        hospital_details = hospital_details.split(",")
+        if hospital_details[0] == hospital_code:
+            return True
+    return False
+
+
 def supplier_login():
     is_valid_supplier = True
     while is_valid_supplier:
@@ -261,14 +281,43 @@ def distribution_module():
         if supplier_code == "":
             print("Invalid Supplier Code")
             continue
+        else:
+            invalid_supplier = True
+            while invalid_supplier:
+                is_valid_supplier_code = check_is_supplier_code_valid(supplier_code)
+                if is_valid_supplier_code:
+                    invalid_supplier = False
+                    break
+                print("Supplier not found")
+                supplier_code = input("Enter Supplier Code: ")
+
         target_hospital_code = input("Enter Target Hospital Code: ")
         if target_hospital_code == "":
-            print("Invalid Target Hospital Code")
+            print("Invalid target Hospital Code")
             continue
+        else:
+            invalid_hospital = True
+            while invalid_hospital:
+                is_valid_hospital_code = check_is_hospital_code_valid(supplier_code)
+                if is_valid_hospital_code:
+                    invalid_hospital = False
+                    break
+                print("Hospital not found")
+                supplier_code = input("Enter Target Hospital Code: ")
+
         quantity_to_distribute = input("Enter Quantity to Distribute: ")
         if quantity_to_distribute == "":
-            print("Invalid Quantity To Distribute")
+            print("Invalid Item Quantity")
             continue
+        else:
+            quantity_is_string = True
+            while quantity_is_string:
+                try:
+                    item_quantity = int(quantity_to_distribute)
+                    quantity_is_string = False
+                except:
+                    print("Item Quantity must be a number")
+                    quantity_to_distribute = input("Enter New Item Quantity: ")
         if supplier_code != "" and target_hospital_code != "" and quantity_to_distribute != "":
             print("OK")
 
