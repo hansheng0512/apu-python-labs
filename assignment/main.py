@@ -1,3 +1,4 @@
+import datetime
 import os
 
 
@@ -97,7 +98,7 @@ def hospital_registration():
         if hospital_name == "":
             print("Invalid Hospital Name")
         if hospital_name != "" and hospital_code != "":
-            hospital_file_object.write("{},{}".format(hospital_name, hospital_code))
+            hospital_file_object.write("{},{}".format(hospital_code, hospital_name))
             hospital_file_object.write("\n")
         if current_hospital == min_hospital:
             continue_ask_confirm = True
@@ -298,12 +299,12 @@ def distribution_module():
         else:
             invalid_hospital = True
             while invalid_hospital:
-                is_valid_hospital_code = check_is_hospital_code_valid(supplier_code)
+                is_valid_hospital_code = check_is_hospital_code_valid(target_hospital_code)
                 if is_valid_hospital_code:
                     invalid_hospital = False
                     break
                 print("Hospital not found")
-                supplier_code = input("Enter Target Hospital Code: ")
+                target_hospital_code = input("Enter Target Hospital Code: ")
 
         quantity_to_distribute = input("Enter Quantity to Distribute: ")
         if quantity_to_distribute == "":
@@ -319,7 +320,9 @@ def distribution_module():
                     print("Item Quantity must be a number")
                     quantity_to_distribute = input("Enter New Item Quantity: ")
         if supplier_code != "" and target_hospital_code != "" and quantity_to_distribute != "":
-            print("OK")
+            current_timestamp = datetime.datetime.now()
+            print(current_timestamp)
+            # distribution_file_object.write("{},{}".format())
 
 
 if __name__ == "__main__":
