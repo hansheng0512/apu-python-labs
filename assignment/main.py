@@ -253,12 +253,28 @@ def update_item_quantity():
     os.rename("temp_ppe.txt", "ppe.txt")
 
 
-# def distribution_module():
-
+def distribution_module():
+    distribution_file_object = open("distribution.txt", "a")
+    distribute_item = True
+    while distribute_item:
+        supplier_code = input("Enter Supplier Code: ")
+        if supplier_code == "":
+            print("Invalid Supplier Code")
+            continue
+        target_hospital_code = input("Enter Target Hospital Code: ")
+        if target_hospital_code == "":
+            print("Invalid Target Hospital Code")
+            continue
+        quantity_to_distribute = input("Enter Quantity to Distribute: ")
+        if quantity_to_distribute == "":
+            print("Invalid Quantity To Distribute")
+            continue
+        if supplier_code != "" and target_hospital_code != "" and quantity_to_distribute != "":
+            print("OK")
 
 
 if __name__ == "__main__":
-    hospital_registration()
+    # hospital_registration()
     # update_item_quantity()
     # add_item_to_inventory()
     # supplier_login()
