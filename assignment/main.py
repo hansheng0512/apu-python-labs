@@ -45,7 +45,6 @@ def check_item_stock_is_enough(supplier_code, item_code, quantity_needed):
 
 
 def update_stock(supplier_code, item_code, new_quantity, action):
-
     if action == "MINUS":
         edited_item_list = []
         initial_ppe_file_object = open("ppe.txt", "r")
@@ -74,6 +73,7 @@ def update_stock(supplier_code, item_code, new_quantity, action):
                                   edited_item_details["item_quantity"]))
             temp_ppe_file_object.write("\n")
         temp_ppe_file_object.close()
+        os.remove("ppe.txt")
         os.rename("temp_ppe.txt", "ppe.txt")
     else:
         initial_item_list = []
@@ -93,8 +93,7 @@ def update_stock(supplier_code, item_code, new_quantity, action):
         edited_item_list = []
 
         for initial_item_details in initial_item_list:
-            if initial_item_details["supplier_code"] == supplier_code and initial_item_details[
-                "item_code"] == item_code:
+            if initial_item_details["supplier_code"] == supplier_code and initial_item_details["item_code"] == item_code:
                 edited_item_list.append({
                     "supplier_code": supplier_code,
                     "item_code": item_code,
@@ -108,9 +107,12 @@ def update_stock(supplier_code, item_code, new_quantity, action):
                 })
 
         for edited_item_details in edited_item_list:
-            temp_ppe_file_object.write("{},{},{}".format(edited_item_details["supplier_code"], edited_item_details["item_code"], edited_item_details["item_quantity"]))
+            temp_ppe_file_object.write(
+                "{},{},{}".format(edited_item_details["supplier_code"], edited_item_details["item_code"],
+                                  edited_item_details["item_quantity"]))
             temp_ppe_file_object.write("\n")
         temp_ppe_file_object.close()
+        os.remove("ppe.txt")
         os.rename("temp_ppe.txt", "ppe.txt")
 
 
@@ -361,46 +363,67 @@ def distribution_module(supplier_code):
                 print("Invalid Input, only accept 0 and 1")
     distribution_file_object.close()
 
+
 if __name__ == "__main__":
     print("---Inventory System by Draden---")
-    print("\t1. Supplier Registration")
-    print("\t2. Hospital Registration")
-    print("\t3. Supplier Login")
-    option = input("Enter Option: ")
-    try:
-        option = int(option)
-    except:
-        print("Option must be a number")
-        exit()
-
-    if option == 1:
-        supplier_registration()
-    elif option == 2:
-        hospital_registration()
-    elif option == 3:
-        supplier_code, supplier_name = supplier_login()
-        print("---Welcome {}, Code: {}---".format(supplier_name, supplier_code))
-        print("\t1. Add Stock")
-        print("\t2. Distribute Stock to Hospital")
-        option = input("Enter Option: ")
-        try:
-            option = int(option)
-        except:
-            print("Option must be a number")
-            exit()
-        if option == 1:
-            add_item_to_inventory(supplier_code)
-        elif option == 2:
-            distribution_module(supplier_code)
-
-    else:
-        print("bye")
-
-
-
-    # hospital_registration()
-    # update_item_quantity()
-    # add_item_to_inventory()
-    # supplier_login()
-    # supplier_registration()
-    # initial_inventory_creation()
+    is_first_time = True
+    is_logged_in = False
+    while True:
+        if is_first_time:
+            print("First Time Setup, need to register 3 or 4 suppliers account first and initialize their inventory")
+            supplier_registration()
+            print("Done Supplier Registration")
+            print("Initialize Inventory")
+            initial_inventory_creation()
+            is_first_time = False
+        else:
+            if not is_logged_in:
+                print("\t1. Supplier Registration")
+                print("\t2. Hospital Registration")
+                print("\t3. Supplier Login")
+                option = input("Enter Option: ")
+                try:
+                    option = int(option)
+                except:
+                    print("Option must be a number")
+                    exit()
+                if option == 1:
+                    supplier_registration()
+                elif option == 2:
+                    hospital_registration()
+                elif option == 3:
+                    is_logged_in = True
+                    supplier_code, supplier_name = supplier_login()
+                    print("---Welcome {}, Code: {}---".format(supplier_name, supplier_code))
+                    print("\t1. Add Stock")
+                    print("\t2. Distribute Stock to Hospital")
+                    print("\t3. Log Out")
+                    option = input("Enter Option: ")
+                    try:
+                        option = int(option)
+                    except:
+                        print("Option must be a number")
+                        exit()
+                    if option == 1:
+                        add_item_to_inventory(supplier_code)
+                    elif option == 2:
+                        distribution_module(supplier_code)
+                    elif option == 3:
+                        is_logged_in = False
+            else:
+                print("---Welcome {}, Code: {}---".format(supplier_name, supplier_code))
+                print("\t1. Add Stock")
+                print("\t2. Distribute Stock to Hospital")
+                print("\t3. Log Out")
+                option = input("Enter Option: ")
+                try:
+                    option = int(option)
+                except:
+                    print("Option must be a number")
+                    exit()
+                if option == 1:
+                    add_item_to_inventory(supplier_code)
+                elif option == 2:
+                    distribution_module(supplier_code)
+                elif option == 3:
+                    is_logged_in = False
