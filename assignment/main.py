@@ -364,6 +364,49 @@ def distribution_module(supplier_code):
     distribution_file_object.close()
 
 
+def retrieve_all_based_on_supplier(supplier_code):
+    ppe_file_object = open("ppe.txt", "r")
+    item_to_show = []
+    for ppe_details in ppe_file_object:
+        ppe_details = ppe_details.rstrip()
+        ppe_details = ppe_details.split(",")
+        if ppe_details[0] == supplier_code:
+            item_to_show.append({
+                "supplier_code": ppe_details[0],
+                "item_code": ppe_details[1],
+                "quantity": ppe_details[2],
+            })
+    return item_to_show
+
+
+def inventory_tracking(supplier_code):
+    while True:
+        if supplier_code == "":
+            print("Supplier Code cannot be empty")
+            supplier_code = input("Enter Supplier Code: ")
+        else:
+            is_valid_supplier = check_is_supplier_code_valid(supplier_code)
+            if is_valid_supplier:
+                break
+            print("Supplier not found")
+            supplier_code = input("Enter Supplier Code: ")
+    print("Tracking Module")
+    print("\t1. View All Stock")
+    print("\t2. View Stock which less than 25")
+    option = input("Enter Option: ")
+    try:
+        option = int(option)
+    except:
+        print("Option must be a number")
+        exit()
+    if option == 1:
+        items_list = retrieve_all_based_on_supplier(supplier_code)
+        for item in items_list:
+            print(item)
+    return True
+
+
+
 if __name__ == "__main__":
     print("---Inventory System by Draden---")
     is_first_time = True
@@ -397,7 +440,8 @@ if __name__ == "__main__":
                     print("---Welcome {}, Code: {}---".format(supplier_name, supplier_code))
                     print("\t1. Add Stock")
                     print("\t2. Distribute Stock to Hospital")
-                    print("\t3. Log Out")
+                    print("\t3. Inventory Tracking")
+                    print("\t4. Log Out")
                     option = input("Enter Option: ")
                     try:
                         option = int(option)
@@ -409,12 +453,15 @@ if __name__ == "__main__":
                     elif option == 2:
                         distribution_module(supplier_code)
                     elif option == 3:
+                        success = inventory_tracking(supplier_code)
+                    elif option == 4:
                         is_logged_in = False
             else:
                 print("---Welcome {}, Code: {}---".format(supplier_name, supplier_code))
                 print("\t1. Add Stock")
                 print("\t2. Distribute Stock to Hospital")
-                print("\t3. Log Out")
+                print("\t3. Inventory Tracking")
+                print("\t4. Log Out")
                 option = input("Enter Option: ")
                 try:
                     option = int(option)
@@ -426,4 +473,6 @@ if __name__ == "__main__":
                 elif option == 2:
                     distribution_module(supplier_code)
                 elif option == 3:
+                    success = inventory_tracking(supplier_code)
+                elif option == 4:
                     is_logged_in = False
