@@ -401,10 +401,19 @@ def inventory_tracking(supplier_code):
         exit()
     if option == 1:
         items_list = retrieve_all_based_on_supplier(supplier_code)
+        print("{:<15} {:<8} {:<8}".format("Supplier Code", "Item Code", "Quantity"))
         for item in items_list:
-            print(item)
+            print("{:<15} {:<8} {:<8}".format(item["supplier_code"], item["item_code"], item["quantity"]))
+    elif option == 2:
+        items_list = retrieve_all_based_on_supplier(supplier_code)
+        print("{:<15} {:<8} {:<8}".format("Supplier Code", "Item Code", "Quantity"))
+        for item in items_list:
+            if int(item["quantity"]) < 25:
+                print("{:<15} {:<8} {:<8}".format(item["supplier_code"], item["item_code"], item["quantity"]))
+    else:
+        print("Invalid Option")
+        exit()
     return True
-
 
 
 if __name__ == "__main__":
