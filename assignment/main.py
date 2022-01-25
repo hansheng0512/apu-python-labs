@@ -86,7 +86,7 @@ def update_stock(supplier_code, item_code, new_quantity, action):
             initial_item_list.append({
                 "supplier_code": initial_item_details[0],
                 "item_code": initial_item_details[1],
-                "item_quantity": initial_item_details[2]
+                "item_quantity": str(int(initial_item_details[2]) + new_quantity)
             })
         initial_ppe_file_object.close()
 
@@ -223,6 +223,11 @@ def initial_inventory_creation():
         if item_code == "":
             print("Invalid Item Code")
             continue
+        else:
+            is_item_exist = check_is_item_code_valid(supplier_code, item_code)
+            if is_item_exist:
+                print("Duplicated Item")
+                continue
         if item_code != "" and supplier_code != "":
             ppe_file_object.write("{},{},{}".format(supplier_code, item_code, 100))
             ppe_file_object.write("\n")
@@ -245,6 +250,7 @@ def initial_inventory_creation():
 def add_item_to_inventory(supplier_code):
     ppe_file_object = open("ppe.txt", "a")
     add_item = True
+    is_item_exist = False
     while add_item:
         if supplier_code == "":
             print("Invalid Supplier Code")
@@ -253,6 +259,8 @@ def add_item_to_inventory(supplier_code):
         if item_code == "":
             print("Invalid Item Code")
             continue
+        else:
+            is_item_exist = check_is_item_code_valid(supplier_code, item_code)
         item_quantity = input("Enter New Item Quantity: ")
         if item_quantity == "":
             print("Invalid Item Quantity")
@@ -266,6 +274,9 @@ def add_item_to_inventory(supplier_code):
                 except:
                     print("Item Quantity must be a number")
                     item_quantity = input("Enter New Item Quantity: ")
+
+        if is_item_exist:
+            update_stock(supplier_code, item_code, item_quantity, "ADD")
 
         if item_code != "" and supplier_code != "" and item_quantity != "":
             ppe_file_object.write("{},{},{}".format(supplier_code, item_code, item_quantity))
