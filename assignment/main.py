@@ -145,6 +145,47 @@ def supplier_login():
                     print("Invalid Input, only accept 0 and 1")
 
 
+def update_supplier_details(supplier_code):
+    supplier_new_name = input("Enter Supplier Name: ")
+    if supplier_new_name == "":
+        print("Invalid Supplier Name")
+    supplier_new_address = input("Enter Supplier Address: ")
+    if supplier_new_address == "":
+        print("Invalid Supplier Address")
+
+    edited_supplier_list = []
+    initial_supplier_file_object = open("supplier.txt", "r")
+    temp_supplier_file_object = open("temp_supplier.txt", "w")
+
+    for initial_supplier_details in initial_supplier_file_object:
+        initial_supplier_details = initial_supplier_details.rstrip()
+        initial_supplier_details = initial_supplier_details.split(",")
+        if initial_supplier_details[0] == supplier_code:
+            edited_supplier_list.append({
+                "supplier_code": initial_supplier_details[0],
+                "supplier_name": supplier_new_name,
+                "supplier_address": supplier_new_address
+            })
+        else:
+            edited_supplier_list.append({
+                "supplier_code": initial_supplier_details[0],
+                "supplier_name": initial_supplier_details[1],
+                "supplier_address": initial_supplier_details[2]
+            })
+
+    for edited_supplier_details in edited_supplier_list:
+        temp_supplier_file_object.write(
+            "{},{},{}".format(edited_supplier_details["supplier_code"], edited_supplier_details["supplier_name"],
+                              edited_supplier_details["supplier_address"]))
+        temp_supplier_file_object.write("\n")
+
+    initial_supplier_file_object.close()
+    initial_supplier_file_object.close()
+    temp_supplier_file_object.close()
+    os.remove("supplier.txt")
+    os.rename("temp_supplier.txt", "supplier.txt")
+
+
 def supplier_registration():
     supplier_file_object = open("supplier.txt", "w")
     min_supplier = 3
@@ -158,8 +199,13 @@ def supplier_registration():
         supplier_name = input("Enter Supplier Name: ")
         if supplier_name == "":
             print("Invalid Supplier Name")
-        if supplier_name != "" and supplier_code != "":
-            supplier_file_object.write("{},{}".format(supplier_code, supplier_name))
+            continue
+        supplier_address = input("Enter Supplier Address: ")
+        if supplier_address == "":
+            print("Invalid Supplier Address")
+            continue
+        if supplier_name != "" and supplier_code != "" and supplier_address != "":
+            supplier_file_object.write("{},{},{}".format(supplier_code, supplier_name, supplier_address))
             supplier_file_object.write("\n")
         if current_supplier == min_supplier:
             continue_ask_confirm = True
@@ -461,7 +507,8 @@ if __name__ == "__main__":
                     print("\t1. Add Stock")
                     print("\t2. Distribute Stock to Hospital")
                     print("\t3. Inventory Tracking")
-                    print("\t4. Log Out")
+                    print("\t4. Profile Update")
+                    print("\t5. Log Out")
                     option = input("Enter Option: ")
                     try:
                         option = int(option)
@@ -475,13 +522,16 @@ if __name__ == "__main__":
                     elif option == 3:
                         success = inventory_tracking(supplier_code)
                     elif option == 4:
+                        update_supplier_details(supplier_code)
+                    elif option == 5:
                         is_logged_in = False
             else:
                 print("---Welcome {}, Code: {}---".format(supplier_name, supplier_code))
                 print("\t1. Add Stock")
                 print("\t2. Distribute Stock to Hospital")
                 print("\t3. Inventory Tracking")
-                print("\t4. Log Out")
+                print("\t4. Profile Update")
+                print("\t5. Log Out")
                 option = input("Enter Option: ")
                 try:
                     option = int(option)
@@ -495,4 +545,6 @@ if __name__ == "__main__":
                 elif option == 3:
                     success = inventory_tracking(supplier_code)
                 elif option == 4:
+                    update_supplier_details(supplier_code)
+                elif option == 5:
                     is_logged_in = False
