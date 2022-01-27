@@ -143,7 +143,6 @@ def update_supplier_details(supplier_code):
         temp_supplier_file_object.write("\n")
 
     initial_supplier_file_object.close()
-    initial_supplier_file_object.close()
     temp_supplier_file_object.close()
     os.remove("supplier.txt")
     os.rename("temp_supplier.txt", "supplier.txt")
@@ -202,16 +201,26 @@ def hospital_registration():
     max_hospital = 4
     current_hospital = 1
     while current_hospital <= max_hospital:
-        hospital_code = input("Enter Hospital Code: ")
-        if hospital_code == "":
-            print("Invalid Hospital Code")
-            continue
-        hospital_name = input("Enter Hospital Name: ")
-        if hospital_name == "":
-            print("Invalid Hospital Name")
-        if hospital_name != "" and hospital_code != "":
-            hospital_file_object.write("{},{}".format(hospital_code, hospital_name))
-            hospital_file_object.write("\n")
+
+        hospital_code = input("Enter Hospital {} Code: ".format(current_hospital))
+        while True:
+            if hospital_code == "":
+                print("Invalid Hospital Code")
+                hospital_code = input("Enter Hospital {} Code: ".format(current_hospital))
+            else:
+                break
+
+        hospital_name = input("Enter Hospital {} Name: ".format(current_hospital))
+        while True:
+            if hospital_name == "":
+                print("Invalid Hospital Name")
+                hospital_name = input("Enter Hospital {} Name: ".format(current_hospital))
+            else:
+                break
+
+        hospital_file_object.write("{},{}".format(hospital_code, hospital_name))
+        hospital_file_object.write("\n")
+
         if current_hospital == min_hospital:
             continue_ask_confirm = True
             while continue_ask_confirm:
@@ -447,22 +456,30 @@ def retrieve_item_history(supplier_code):
                 item_code = input("Enter Item Code: ")
 
     distribution_file_object = open("distribution.txt", "r")
-    item_retrieved = []
-    hospital_list = []
+    datetime_list = []
+    supplier_code_list = []
+    target_hospital_list = []
+    distinct_hospital_list = []
+    distinct_item_list = []
+    distinct_quantity_list = []
+    item_code_list = []
+    quantity_list = []
     for distribution_details in distribution_file_object:
         distribution_details = distribution_details.rstrip()
         distribution_details = distribution_details.split(",")
         if distribution_details[1] == supplier_code and distribution_details[3] == item_code:
-            if distribution_details[2] not in hospital_list:
-                hospital_list.append(distribution_details[2])
-            item_retrieved.append({
-                "datetime": distribution_details[0],
-                "supplier_code": distribution_details[1],
-                "target_hospital": distribution_details[2],
-                "item_code": distribution_details[3],
-                "quantity": distribution_details[4],
-            })
-    print(item_retrieved)
+            if distribution_details[2] not in distinct_hospital_list:
+                distinct_hospital_list.append(distribution_details[2])
+            if distribution_details[3] not in distinct_item_list:
+                distinct_item_list.append(distribution_details[3])
+            datetime_list.append(distribution_details[0])
+            supplier_code_list.append(distribution_details[1])
+            target_hospital_list.append(distribution_details[2])
+            item_code_list.append(distribution_details[3])
+            quantity_list.append(distribution_details[4])
+
+    print("OK")
+    # print(item_to_show)
 
 
 def inventory_tracking(supplier_code):
