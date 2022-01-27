@@ -104,19 +104,9 @@ def supplier_login():
                 if supplier_code == raw_supplier_code:
                     print("Supplier Found")
                     return supplier_code, raw_supplier_name
-            print("Invalid Supplier")
-            continue_ask_research = True
-            while continue_ask_research:
-                break_process = input("Want to research? [0-no 1-yes]: ")
-                if break_process == "0" or break_process == "1":
-                    if break_process == "0":
-                        continue_ask_research = False
-                        is_valid_supplier = False
-                    else:
-                        continue_ask_research = False
-                else:
-                    continue_ask_research = True
-                    print("Invalid Input, only accept 0 and 1")
+            print("Supplier Not Found")
+        else:
+            print("Supplier Code cannot be empty")
 
 
 def update_supplier_details(supplier_code):
