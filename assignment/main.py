@@ -476,9 +476,50 @@ def retrieve_item_history(supplier_code):
             supplier_code_list.append(distribution_details[1])
             target_hospital_list.append(distribution_details[2])
             item_code_list.append(distribution_details[3])
-            quantity_list.append(distribution_details[4])
+            quantity_list.append(int(distribution_details[4]))
 
     print("OK")
+    list1 = supplier_code_list
+    list2 = target_hospital_list
+    list3 = quantity_list
+    list4 = item_code_list
+
+    res1 = []
+    res2 = []
+    res3 = []
+    res4 = []
+
+    def pop_list():
+        ref1 = list1.pop(0)
+        ref2 = list2.pop(0)
+        ref3 = list3.pop(0)
+        ref4 = list4.pop(0)
+        j = 0
+        while j < len(list1):
+            data1 = list1[j]
+            data2 = list2[j]
+            data3 = list3[j]
+            data4 = list4[j]
+            if data1 == ref1 and data2 == ref2 and data4 == ref4:
+                ref3 += data3
+                list1.pop(j)
+                list2.pop(j)
+                list3.pop(j)
+                list4.pop(j)
+                continue
+            j += 1
+        res1.append(ref1)
+        res2.append(ref2)
+        res3.append(ref3)
+        res4.append(ref4)
+
+    while len(list1) > 0:
+        pop_list()
+
+    print(res1)
+    print(res2)
+    print(res3)
+    print(res4)
     # print(item_to_show)
 
 
