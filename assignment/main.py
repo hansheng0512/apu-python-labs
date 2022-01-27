@@ -60,11 +60,6 @@ def update_stock(supplier_code, item_code, new_quantity, action):
             temp_ppe_file_object.write(
                 "{},{},{}".format(initial_item_details[0], initial_item_details[1],final_quantity))
             temp_ppe_file_object.write("\n")
-
-        initial_ppe_file_object.close()
-        temp_ppe_file_object.close()
-        os.remove("ppe.txt")
-        os.rename("temp_ppe.txt", "ppe.txt")
     else:
         for initial_item_details in initial_ppe_file_object:
             initial_item_details = initial_item_details.rstrip()
@@ -73,11 +68,12 @@ def update_stock(supplier_code, item_code, new_quantity, action):
             temp_ppe_file_object.write(
                 "{},{},{}".format(initial_item_details[0], initial_item_details[1], str(int(initial_item_details[2]) + new_quantity)))
             temp_ppe_file_object.write("\n")
-        initial_ppe_file_object.close()
+    initial_ppe_file_object.close()
+    temp_ppe_file_object.close()
+    os.remove("ppe.txt")
+    os.rename("temp_ppe.txt", "ppe.txt")
+    print("Stock Updated Successfully")
 
-        temp_ppe_file_object.close()
-        os.remove("ppe.txt")
-        os.rename("temp_ppe.txt", "ppe.txt")
 
 
 def supplier_login():
@@ -111,36 +107,35 @@ def supplier_login():
 
 def update_supplier_details(supplier_code):
     supplier_new_name = input("Enter Supplier Name: ")
-    if supplier_new_name == "":
-        print("Invalid Supplier Name")
+    while True:
+        if supplier_new_name == "":
+            print("Invalid Supplier Name")
+            supplier_new_name = input("Enter Supplier Name: ")
+        else:
+            break
     supplier_new_address = input("Enter Supplier Address: ")
-    if supplier_new_address == "":
-        print("Invalid Supplier Address")
+    while True:
+        if supplier_new_address == "":
+            print("Invalid Supplier Address")
+            supplier_new_address = input("Enter Supplier Address: ")
+        else:
+            break
 
-    edited_supplier_list = []
     initial_supplier_file_object = open("supplier.txt", "r")
     temp_supplier_file_object = open("temp_supplier.txt", "w")
 
     for initial_supplier_details in initial_supplier_file_object:
         initial_supplier_details = initial_supplier_details.rstrip()
         initial_supplier_details = initial_supplier_details.split(",")
+        supplier_code_to_save = supplier_code
         if initial_supplier_details[0] == supplier_code:
-            edited_supplier_list.append({
-                "supplier_code": initial_supplier_details[0],
-                "supplier_name": supplier_new_name,
-                "supplier_address": supplier_new_address
-            })
+            supplier_name_to_save = supplier_new_name
+            supplier_address_to_save = supplier_new_address
         else:
-            edited_supplier_list.append({
-                "supplier_code": initial_supplier_details[0],
-                "supplier_name": initial_supplier_details[1],
-                "supplier_address": initial_supplier_details[2]
-            })
-
-    for edited_supplier_details in edited_supplier_list:
+            supplier_name_to_save = initial_supplier_details[1]
+            supplier_address_to_save = initial_supplier_details[2]
         temp_supplier_file_object.write(
-            "{},{},{}".format(edited_supplier_details["supplier_code"], edited_supplier_details["supplier_name"],
-                              edited_supplier_details["supplier_address"]))
+            "{},{},{}".format(supplier_code_to_save, supplier_name_to_save,supplier_address_to_save))
         temp_supplier_file_object.write("\n")
 
     initial_supplier_file_object.close()
@@ -148,6 +143,7 @@ def update_supplier_details(supplier_code):
     temp_supplier_file_object.close()
     os.remove("supplier.txt")
     os.rename("temp_supplier.txt", "supplier.txt")
+    print("Profile Updated Successfully")
 
 
 def supplier_registration():
