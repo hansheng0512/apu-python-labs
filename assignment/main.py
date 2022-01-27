@@ -60,14 +60,28 @@ def update_stock(supplier_code, item_code, new_quantity, action):
             temp_ppe_file_object.write(
                 "{},{},{}".format(initial_item_details[0], initial_item_details[1],final_quantity))
             temp_ppe_file_object.write("\n")
+    elif action == "ADD":
+        for initial_item_details in initial_ppe_file_object:
+            initial_item_details = initial_item_details.rstrip()
+            initial_item_details = initial_item_details.split(",")
+            if initial_item_details[0] == supplier_code and initial_item_details[1] == item_code:
+                temp_ppe_file_object.write(
+                    "{},{},{}".format(initial_item_details[0], initial_item_details[1], str(int(initial_item_details[2]) + new_quantity)))
+            else:
+                temp_ppe_file_object.write(
+                    "{},{},{}".format(initial_item_details[0], initial_item_details[1],initial_item_details[2]))
+            temp_ppe_file_object.write("\n")
     else:
         for initial_item_details in initial_ppe_file_object:
             initial_item_details = initial_item_details.rstrip()
             initial_item_details = initial_item_details.split(",")
 
             temp_ppe_file_object.write(
-                "{},{},{}".format(initial_item_details[0], initial_item_details[1], str(int(initial_item_details[2]) + new_quantity)))
+                "{},{},{}".format(initial_item_details[0], initial_item_details[1], initial_item_details[2]))
             temp_ppe_file_object.write("\n")
+        temp_ppe_file_object.write(
+            "{},{},{}".format(supplier_code, item_code, new_quantity))
+        temp_ppe_file_object.write("\n")
     initial_ppe_file_object.close()
     temp_ppe_file_object.close()
     os.remove("ppe.txt")
@@ -276,10 +290,9 @@ def initial_inventory_creation():
 
 
 def add_item_to_inventory(supplier_code):
-    ppe_file_object = open("ppe.txt", "a")
     add_item = True
+    is_existing_item = False
     while add_item:
-        supplier_code = input("Enter Supplier Code: ")
         while True:
             if supplier_code == "":
                 print("Supplier Code cannot be empty")
@@ -300,10 +313,8 @@ def add_item_to_inventory(supplier_code):
             else:
                 is_item_exist = check_is_item_code_valid(supplier_code, item_code)
                 if is_item_exist:
-                    print("Duplicated Item Code")
-                    item_code = input("Enter Item Code: ")
-                else:
-                    break
+                    is_existing_item = True
+                break
 
         item_quantity = input("Enter New Item Quantity: ")
         while True:
@@ -318,10 +329,10 @@ def add_item_to_inventory(supplier_code):
                     print("Quantity must be a number")
                     item_quantity = input("Enter New Item Quantity: ")
 
-        update_stock(supplier_code, item_code, item_quantity, "ADD")
-
-        ppe_file_object.write("{},{},{}".format(supplier_code, item_code, item_quantity))
-        ppe_file_object.write("\n")
+        if is_existing_item:
+            update_stock(supplier_code, item_code, item_quantity, "ADD")
+        else:
+            update_stock(supplier_code, item_code, item_quantity, "NEW")
 
         continue_ask_confirm = True
         while continue_ask_confirm:
@@ -336,7 +347,6 @@ def add_item_to_inventory(supplier_code):
             else:
                 continue_ask_confirm = True
                 print("Invalid Input, only accept 0 and 1")
-    ppe_file_object.close()
 
 
 def distribution_module(supplier_code):
