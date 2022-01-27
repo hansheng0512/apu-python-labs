@@ -39,9 +39,9 @@ def check_item_stock_is_enough(supplier_code, item_code, quantity_needed):
         ppe_details = ppe_details.split(",")
         if ppe_details[0] == supplier_code and ppe_details[1] == item_code:
             if int(ppe_details[2]) < int(quantity_needed):
-                return False
+                return False, ppe_details[2]
             else:
-                return True
+                return True, ppe_details[2]
 
 
 def update_stock(supplier_code, item_code, new_quantity, action):
@@ -394,7 +394,8 @@ def distribution_module(supplier_code):
                     print("Quantity must be a number")
                     quantity_to_distribute = input("Enter Quantity to Distribute: ")
 
-        if check_item_stock_is_enough(supplier_code, item_code, quantity_to_distribute):
+        is_stock_enough, balance = check_item_stock_is_enough(supplier_code, item_code, quantity_to_distribute)
+        if is_stock_enough:
             update_stock(supplier_code, item_code, quantity_to_distribute, "MINUS")
             current_timestamp = datetime.datetime.now()
             distribution_file_object.write(
@@ -402,7 +403,7 @@ def distribution_module(supplier_code):
                                         quantity_to_distribute))
             distribution_file_object.write("\n")
         else:
-            print("No Record or Invalid Stock")
+            print("Invalid Stock, remaining {} only".format(balance))
 
         continue_ask_confirm = True
         while continue_ask_confirm:
@@ -462,15 +463,6 @@ def retrieve_item_history(supplier_code):
                 "quantity": distribution_details[4],
             })
     print(item_retrieved)
-    # for hospital in hospital_list:
-    #     item_to_append = {}
-    #     item_to_append["hospital_code"] = hospital
-    #     for distribution_details in item_retrieved:
-    #         if distribution_details["target_hospital"] == hospital:
-    #             item_to_append["details"] = distribution_details
-    #     item_to_show.append(item_to_append)
-    #
-    # print(item_to_show)
 
 
 def inventory_tracking(supplier_code):
@@ -489,12 +481,16 @@ def inventory_tracking(supplier_code):
     print("\t1. View All Stock")
     print("\t2. View Stock which less than 25")
     print("\t3. Search Distributed Item based on Item Id")
-    option = input("Enter Option: ")
-    try:
-        option = int(option)
-    except:
-        print("Option must be a number")
-        exit()
+    while True:
+        option = input("Enter Option: ")
+        try:
+            option = int(option)
+            if option == 1 or option == 2 or option == 3:
+                break
+            else:
+                print("Invalid Option")
+        except:
+            print("Option must be a number")
     if option == 1:
         items_list = retrieve_all_based_on_supplier(supplier_code)
         print("{:<15} {:<8} {:<8}".format("Supplier Code", "Item Code", "Quantity"))
@@ -504,13 +500,10 @@ def inventory_tracking(supplier_code):
         items_list = retrieve_all_based_on_supplier(supplier_code)
         print("{:<15} {:<8} {:<8}".format("Supplier Code", "Item Code", "Quantity"))
         for item in items_list:
-            if int(item["quantity"]) < 25:
+            if int(item[2]) < 25:
                 print("{:<15} {:<8} {:<8}".format(item[0], item[1], item[2]))
     elif option == 3:
         retrieve_item_history(supplier_code)
-    else:
-        print("Invalid Option")
-        exit()
     return True
 
 
@@ -531,12 +524,17 @@ if __name__ == "__main__":
                 print("\t1. Supplier Registration")
                 print("\t2. Hospital Registration")
                 print("\t3. Supplier Login")
-                option = input("Enter Option: ")
-                try:
-                    option = int(option)
-                except:
-                    print("Option must be a number")
-                    exit()
+                print("\t4. Exit")
+                while True:
+                    option = input("Enter Option: ")
+                    try:
+                        option = int(option)
+                        if option == 1 or option == 2 or option == 3 or option == 4:
+                            break
+                        else:
+                            print("Invalid Option")
+                    except:
+                        print("Option must be a number")
                 if option == 1:
                     supplier_registration()
                 elif option == 2:
@@ -550,12 +548,16 @@ if __name__ == "__main__":
                     print("\t3. Inventory Tracking")
                     print("\t4. Profile Update")
                     print("\t5. Log Out")
-                    option = input("Enter Option: ")
-                    try:
-                        option = int(option)
-                    except:
-                        print("Option must be a number")
-                        exit()
+                    while True:
+                        option = input("Enter Option: ")
+                        try:
+                            option = int(option)
+                            if option == 1 or option == 2 or option == 3 or option == 4 or option == 5:
+                                break
+                            else:
+                                print("Invalid Option")
+                        except:
+                            print("Option must be a number")
                     if option == 1:
                         add_item_to_inventory(supplier_code)
                     elif option == 2:
@@ -566,6 +568,9 @@ if __name__ == "__main__":
                         update_supplier_details(supplier_code)
                     elif option == 5:
                         is_logged_in = False
+                elif option == 4:
+                    print("Thank you, bye")
+                    exit()
             else:
                 print("---Welcome {}, Code: {}---".format(supplier_name, supplier_code))
                 print("\t1. Add Stock")
@@ -573,12 +578,16 @@ if __name__ == "__main__":
                 print("\t3. Inventory Tracking")
                 print("\t4. Profile Update")
                 print("\t5. Log Out")
-                option = input("Enter Option: ")
-                try:
-                    option = int(option)
-                except:
-                    print("Option must be a number")
-                    exit()
+                while True:
+                    option = input("Enter Option: ")
+                    try:
+                        option = int(option)
+                        if option == 1 or option == 2 or option == 3 or option == 4 or option == 5:
+                            break
+                        else:
+                            print("Invalid Option")
+                    except:
+                        print("Option must be a number")
                 if option == 1:
                     add_item_to_inventory(supplier_code)
                 elif option == 2:
