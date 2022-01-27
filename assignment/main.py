@@ -45,72 +45,36 @@ def check_item_stock_is_enough(supplier_code, item_code, quantity_needed):
 
 
 def update_stock(supplier_code, item_code, new_quantity, action):
-    if action == "MINUS":
-        edited_item_list = []
-        initial_ppe_file_object = open("ppe.txt", "r")
-        temp_ppe_file_object = open("temp_ppe.txt", "w")
+    initial_ppe_file_object = open("ppe.txt", "r")
+    temp_ppe_file_object = open("temp_ppe.txt", "w")
 
+    if action == "MINUS":
         for initial_item_details in initial_ppe_file_object:
             initial_item_details = initial_item_details.rstrip()
             initial_item_details = initial_item_details.split(",")
             if initial_item_details[0] == supplier_code and initial_item_details[1] == item_code:
-                edited_item_list.append({
-                    "supplier_code": initial_item_details[0],
-                    "item_code": initial_item_details[1],
-                    "item_quantity": str(int(initial_item_details[2]) - new_quantity)
-                })
+                final_quantity = str(int(initial_item_details[2]) - new_quantity)
             else:
-                edited_item_list.append({
-                    "supplier_code": initial_item_details[0],
-                    "item_code": initial_item_details[1],
-                    "item_quantity": initial_item_details[2]
-                })
-        initial_ppe_file_object.close()
+                final_quantity = initial_item_details[2]
 
-        for edited_item_details in edited_item_list:
             temp_ppe_file_object.write(
-                "{},{},{}".format(edited_item_details["supplier_code"], edited_item_details["item_code"],
-                                  edited_item_details["item_quantity"]))
+                "{},{},{}".format(initial_item_details[0], initial_item_details[1],final_quantity))
             temp_ppe_file_object.write("\n")
+
+        initial_ppe_file_object.close()
         temp_ppe_file_object.close()
         os.remove("ppe.txt")
         os.rename("temp_ppe.txt", "ppe.txt")
     else:
-        initial_item_list = []
-        initial_ppe_file_object = open("ppe.txt", "r")
-        temp_ppe_file_object = open("temp_ppe.txt", "w")
-
         for initial_item_details in initial_ppe_file_object:
             initial_item_details = initial_item_details.rstrip()
             initial_item_details = initial_item_details.split(",")
-            initial_item_list.append({
-                "supplier_code": initial_item_details[0],
-                "item_code": initial_item_details[1],
-                "item_quantity": str(int(initial_item_details[2]) + new_quantity)
-            })
+
+            temp_ppe_file_object.write(
+                "{},{},{}".format(initial_item_details[0], initial_item_details[1], str(int(initial_item_details[2]) + new_quantity)))
+            temp_ppe_file_object.write("\n")
         initial_ppe_file_object.close()
 
-        edited_item_list = []
-
-        for initial_item_details in initial_item_list:
-            if initial_item_details["supplier_code"] == supplier_code and initial_item_details["item_code"] == item_code:
-                edited_item_list.append({
-                    "supplier_code": supplier_code,
-                    "item_code": item_code,
-                    "item_quantity": new_quantity
-                })
-            else:
-                edited_item_list.append({
-                    "supplier_code": initial_item_details["supplier_code"],
-                    "item_code": initial_item_details["item_code"],
-                    "item_quantity": initial_item_details["item_quantity"]
-                })
-
-        for edited_item_details in edited_item_list:
-            temp_ppe_file_object.write(
-                "{},{},{}".format(edited_item_details["supplier_code"], edited_item_details["item_code"],
-                                  edited_item_details["item_quantity"]))
-            temp_ppe_file_object.write("\n")
         temp_ppe_file_object.close()
         os.remove("ppe.txt")
         os.rename("temp_ppe.txt", "ppe.txt")
@@ -436,6 +400,48 @@ def retrieve_all_based_on_supplier(supplier_code):
     return item_to_show
 
 
+def retrieve_item_history(supplier_code):
+    item_code = input("Enter Item Code: ")
+    while True:
+        if item_code == "":
+            print("Item Code cannot be empty")
+            item_code = input("Enter Item Code: ")
+        else:
+            is_valid_item = check_is_item_code_valid(supplier_code, item_code)
+            if is_valid_item:
+                break
+            print("Item not found")
+            item_code = input("Enter Item Code: ")
+
+    distribution_file_object = open("distribution.txt", "r")
+    item_retrieved = []
+    hospital_list = []
+    item_to_show = []
+    for distribution_details in distribution_file_object:
+        distribution_details = distribution_details.rstrip()
+        distribution_details = distribution_details.split(",")
+        if distribution_details[1] == supplier_code and distribution_details[3] == item_code:
+            if distribution_details[2] not in hospital_list:
+                hospital_list.append(distribution_details[2])
+            item_retrieved.append({
+                "datetime": distribution_details[0],
+                "supplier_code": distribution_details[1],
+                "target_hospital": distribution_details[2],
+                "item_code": distribution_details[3],
+                "quantity": distribution_details[4],
+            })
+    print(item_retrieved)
+    # for hospital in hospital_list:
+    #     item_to_append = {}
+    #     item_to_append["hospital_code"] = hospital
+    #     for distribution_details in item_retrieved:
+    #         if distribution_details["target_hospital"] == hospital:
+    #             item_to_append["details"] = distribution_details
+    #     item_to_show.append(item_to_append)
+    #
+    # print(item_to_show)
+
+
 def inventory_tracking(supplier_code):
     while True:
         if supplier_code == "":
@@ -450,6 +456,7 @@ def inventory_tracking(supplier_code):
     print("Tracking Module")
     print("\t1. View All Stock")
     print("\t2. View Stock which less than 25")
+    print("\t3. Search Distributed Item based on Item Id")
     option = input("Enter Option: ")
     try:
         option = int(option)
@@ -467,6 +474,8 @@ def inventory_tracking(supplier_code):
         for item in items_list:
             if int(item["quantity"]) < 25:
                 print("{:<15} {:<8} {:<8}".format(item["supplier_code"], item["item_code"], item["quantity"]))
+    elif option == 3:
+        retrieve_item_history(supplier_code)
     else:
         print("Invalid Option")
         exit()
