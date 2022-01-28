@@ -44,6 +44,44 @@ def check_item_stock_is_enough(supplier_code, item_code, quantity_needed):
                 return True, ppe_details[2]
 
 
+def sort_and_filter_item_search(supplier_code_list, target_hospital_list, quantity_list, item_code_list):
+
+    supplier_code_list_to_show = []
+    target_hospital_list_to_show = []
+    quantity_list_to_show = []
+    item_code_list_to_show = []
+
+    while len(supplier_code_list) > 0:
+        ref1 = supplier_code_list.pop(0)
+        ref2 = target_hospital_list.pop(0)
+        ref3 = quantity_list.pop(0)
+        ref4 = item_code_list.pop(0)
+        j = 0
+        while j < len(supplier_code_list):
+            data1 = supplier_code_list[j]
+            data2 = target_hospital_list[j]
+            data3 = quantity_list[j]
+            data4 = item_code_list[j]
+            if data1 == ref1 and data2 == ref2 and data4 == ref4:
+                ref3 += data3
+                supplier_code_list.pop(j)
+                target_hospital_list.pop(j)
+                quantity_list.pop(j)
+                item_code_list.pop(j)
+                continue
+            j += 1
+        supplier_code_list_to_show.append(ref1)
+        target_hospital_list_to_show.append(ref2)
+        quantity_list_to_show.append(ref3)
+        item_code_list_to_show.append(ref4)
+
+    print("{:<15} {:<15} {:<8} {:<8}".format("Supplier Code", "Target Hospital", "Quantity", "Item Code"))
+    index = 0
+    for supplier_code in supplier_code_list_to_show:
+        print("{:<15} {:<15} {:<8} {:<8}".format(supplier_code, target_hospital_list_to_show[index], quantity_list_to_show[index], item_code_list_to_show[index]))
+        index = index + 1
+
+
 def update_stock(supplier_code, item_code, new_quantity, action):
     initial_ppe_file_object = open("ppe.txt", "r")
     temp_ppe_file_object = open("temp_ppe.txt", "w")
@@ -456,71 +494,20 @@ def retrieve_item_history(supplier_code):
                 item_code = input("Enter Item Code: ")
 
     distribution_file_object = open("distribution.txt", "r")
-    datetime_list = []
     supplier_code_list = []
     target_hospital_list = []
-    distinct_hospital_list = []
-    distinct_item_list = []
-    distinct_quantity_list = []
     item_code_list = []
     quantity_list = []
     for distribution_details in distribution_file_object:
         distribution_details = distribution_details.rstrip()
         distribution_details = distribution_details.split(",")
         if distribution_details[1] == supplier_code and distribution_details[3] == item_code:
-            if distribution_details[2] not in distinct_hospital_list:
-                distinct_hospital_list.append(distribution_details[2])
-            if distribution_details[3] not in distinct_item_list:
-                distinct_item_list.append(distribution_details[3])
-            datetime_list.append(distribution_details[0])
             supplier_code_list.append(distribution_details[1])
             target_hospital_list.append(distribution_details[2])
             item_code_list.append(distribution_details[3])
             quantity_list.append(int(distribution_details[4]))
 
-    print("OK")
-    list1 = supplier_code_list
-    list2 = target_hospital_list
-    list3 = quantity_list
-    list4 = item_code_list
-
-    res1 = []
-    res2 = []
-    res3 = []
-    res4 = []
-
-    def pop_list():
-        ref1 = list1.pop(0)
-        ref2 = list2.pop(0)
-        ref3 = list3.pop(0)
-        ref4 = list4.pop(0)
-        j = 0
-        while j < len(list1):
-            data1 = list1[j]
-            data2 = list2[j]
-            data3 = list3[j]
-            data4 = list4[j]
-            if data1 == ref1 and data2 == ref2 and data4 == ref4:
-                ref3 += data3
-                list1.pop(j)
-                list2.pop(j)
-                list3.pop(j)
-                list4.pop(j)
-                continue
-            j += 1
-        res1.append(ref1)
-        res2.append(ref2)
-        res3.append(ref3)
-        res4.append(ref4)
-
-    while len(list1) > 0:
-        pop_list()
-
-    print(res1)
-    print(res2)
-    print(res3)
-    print(res4)
-    # print(item_to_show)
+    sort_and_filter_item_search(supplier_code_list, target_hospital_list, quantity_list, item_code_list)
 
 
 def inventory_tracking(supplier_code):
