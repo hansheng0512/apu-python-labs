@@ -553,7 +553,7 @@ def inventory_tracking(supplier_code):
 
 
 if __name__ == "__main__":
-    print("---Inventory System by Draden---")
+    print("---Inventory System---")
     is_first_time = True
     is_logged_in = False
     while True:
