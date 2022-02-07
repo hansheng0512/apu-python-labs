@@ -552,6 +552,35 @@ def inventory_tracking(supplier_code):
     return True
 
 
+def supplier_menu(supplier_name, supplier_code):
+    print("---Welcome {}, Code: {}---".format(supplier_name, supplier_code))
+    print("\t1. Add Stock")
+    print("\t2. Distribute Stock to Hospital")
+    print("\t3. Inventory Tracking")
+    print("\t4. Profile Update")
+    print("\t5. Log Out")
+    while True:
+        option = input("Enter Option: ")
+        try:
+            option = int(option)
+            if option == 1 or option == 2 or option == 3 or option == 4 or option == 5:
+                break
+            else:
+                print("Invalid Option")
+        except:
+            print("Option must be a number")
+    if option == 1:
+        add_item_to_inventory(supplier_code)
+    elif option == 2:
+        distribution_module(supplier_code)
+    elif option == 3:
+        success = inventory_tracking(supplier_code)
+    elif option == 4:
+        update_supplier_details(supplier_code)
+    elif option == 5:
+        is_logged_in = False
+
+
 if __name__ == "__main__":
     print("---Inventory System---")
     is_first_time = True
@@ -587,59 +616,9 @@ if __name__ == "__main__":
                 elif option == 3:
                     is_logged_in = True
                     supplier_code, supplier_name = supplier_login()
-                    print("---Welcome {}, Code: {}---".format(supplier_name, supplier_code))
-                    print("\t1. Add Stock")
-                    print("\t2. Distribute Stock to Hospital")
-                    print("\t3. Inventory Tracking")
-                    print("\t4. Profile Update")
-                    print("\t5. Log Out")
-                    while True:
-                        option = input("Enter Option: ")
-                        try:
-                            option = int(option)
-                            if option == 1 or option == 2 or option == 3 or option == 4 or option == 5:
-                                break
-                            else:
-                                print("Invalid Option")
-                        except:
-                            print("Option must be a number")
-                    if option == 1:
-                        add_item_to_inventory(supplier_code)
-                    elif option == 2:
-                        distribution_module(supplier_code)
-                    elif option == 3:
-                        success = inventory_tracking(supplier_code)
-                    elif option == 4:
-                        update_supplier_details(supplier_code)
-                    elif option == 5:
-                        is_logged_in = False
+                    supplier_menu(supplier_name, supplier_code)
                 elif option == 4:
                     print("Thank you, bye")
                     exit()
             else:
-                print("---Welcome {}, Code: {}---".format(supplier_name, supplier_code))
-                print("\t1. Add Stock")
-                print("\t2. Distribute Stock to Hospital")
-                print("\t3. Inventory Tracking")
-                print("\t4. Profile Update")
-                print("\t5. Log Out")
-                while True:
-                    option = input("Enter Option: ")
-                    try:
-                        option = int(option)
-                        if option == 1 or option == 2 or option == 3 or option == 4 or option == 5:
-                            break
-                        else:
-                            print("Invalid Option")
-                    except:
-                        print("Option must be a number")
-                if option == 1:
-                    add_item_to_inventory(supplier_code)
-                elif option == 2:
-                    distribution_module(supplier_code)
-                elif option == 3:
-                    success = inventory_tracking(supplier_code)
-                elif option == 4:
-                    update_supplier_details(supplier_code)
-                elif option == 5:
-                    is_logged_in = False
+                supplier_menu(supplier_name, supplier_code)
