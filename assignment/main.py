@@ -1,7 +1,6 @@
 import datetime
 import os
 
-
 def check_is_supplier_code_valid(supplier_code):
     supplier_file_object = open("supplier.txt", "r")
     for supplier_details in supplier_file_object:
@@ -94,7 +93,7 @@ def sort_and_filter_item_search(supplier_code_list, target_hospital_list, quanti
 
 def update_stock(supplier_code, item_code, new_quantity, action):
     initial_ppe_file_object = open("ppe.txt", "r")
-    temp_ppe_file_object = open("temp_ppe.txt", "w")
+    initial_ppe_file_object_list = []
 
     if action == "MINUS":
         for initial_item_details in initial_ppe_file_object:
@@ -104,43 +103,46 @@ def update_stock(supplier_code, item_code, new_quantity, action):
                 final_quantity = str(int(initial_item_details[2]) - new_quantity)
             else:
                 final_quantity = initial_item_details[2]
+            initial_ppe_file_object_list.append("{},{},{}".format(initial_item_details[0], initial_item_details[1], final_quantity))
 
-            temp_ppe_file_object.write(
-                "{},{},{}".format(initial_item_details[0], initial_item_details[1], final_quantity))
-            temp_ppe_file_object.write("\n")
+        temp_ppe_file_object = open("ppe.txt", "w")
+        for initial_ppe_file_item in initial_ppe_file_object_list:
+            temp_ppe_file_object.write(initial_ppe_file_item + "\n")
+
     elif action == "ADD":
         for initial_item_details in initial_ppe_file_object:
             initial_item_details = initial_item_details.rstrip()
             initial_item_details = initial_item_details.split(",")
             if initial_item_details[0] == supplier_code and initial_item_details[1] == item_code:
-                temp_ppe_file_object.write(
-                    "{},{},{}".format(initial_item_details[0], initial_item_details[1],
+                initial_ppe_file_object_list.append("{},{},{}".format(initial_item_details[0], initial_item_details[1],
                                       str(int(initial_item_details[2]) + new_quantity)))
             else:
-                temp_ppe_file_object.write(
+                initial_ppe_file_object_list.append(
                     "{},{},{}".format(initial_item_details[0], initial_item_details[1], initial_item_details[2]))
-            temp_ppe_file_object.write("\n")
+
+        temp_ppe_file_object = open("ppe.txt", "w")
+        for initial_ppe_file_item in initial_ppe_file_object_list:
+            temp_ppe_file_object.write(initial_ppe_file_item + "\n")
     else:
         for initial_item_details in initial_ppe_file_object:
             initial_item_details = initial_item_details.rstrip()
             initial_item_details = initial_item_details.split(",")
-
-            temp_ppe_file_object.write(
-                "{},{},{}".format(initial_item_details[0], initial_item_details[1], initial_item_details[2]))
-            temp_ppe_file_object.write("\n")
+            initial_ppe_file_object_list.append("{},{},{}".format(initial_item_details[0], initial_item_details[1], initial_item_details[2]))
+        temp_ppe_file_object = open("ppe.txt", "w")
+        for initial_ppe_file_item in initial_ppe_file_object_list:
+            temp_ppe_file_object.write(initial_ppe_file_item + "\n")
         temp_ppe_file_object.write(
             "{},{},{}".format(supplier_code, item_code, new_quantity))
         temp_ppe_file_object.write("\n")
+
     initial_ppe_file_object.close()
     temp_ppe_file_object.close()
-    os.remove("ppe.txt")
-    os.rename("temp_ppe.txt", "ppe.txt")
     print("Stock Updated Successfully")
 
 
 def supplier_login():
-    is_valid_supplier = True
-    while is_valid_supplier:
+    invalid_supplier = True
+    while invalid_supplier:
         supplier_code = input("Please input supplier code: ")
         if supplier_code != "":
             supplier_file_object = open("supplier.txt", "r")
@@ -150,7 +152,6 @@ def supplier_login():
                 raw_supplier_name = supplier_details[1]
                 raw_supplier_code = supplier_details[0]
                 if supplier_code == raw_supplier_code:
-                    print("Supplier Found")
                     return supplier_code, raw_supplier_name
             print("Supplier Not Found")
         else:
@@ -174,7 +175,7 @@ def update_supplier_details(supplier_code):
             break
 
     initial_supplier_file_object = open("supplier.txt", "r")
-    temp_supplier_file_object = open("temp_supplier.txt", "w")
+    initial_supplier_file_object_list = []
 
     for initial_supplier_details in initial_supplier_file_object:
         initial_supplier_details = initial_supplier_details.rstrip()
@@ -186,14 +187,17 @@ def update_supplier_details(supplier_code):
         else:
             supplier_name_to_save = initial_supplier_details[1]
             supplier_address_to_save = initial_supplier_details[2]
-        temp_supplier_file_object.write(
-            "{},{},{}".format(supplier_code_to_save, supplier_name_to_save, supplier_address_to_save))
-        temp_supplier_file_object.write("\n")
+        initial_supplier_file_object_list.append("{},{},{}".format(supplier_code_to_save, supplier_name_to_save, supplier_address_to_save))
+
+    temp_supplier_file_object = open("supplier.txt", "w")
+    for initial_supplier_file_item in initial_supplier_file_object_list:
+        temp_supplier_file_object.write(initial_supplier_file_item + "\n")
+    temp_supplier_file_object.write(
+        "{},{},{}".format(supplier_code_to_save, supplier_name_to_save, supplier_address_to_save))
+    temp_supplier_file_object.write("\n")
 
     initial_supplier_file_object.close()
     temp_supplier_file_object.close()
-    os.remove("supplier.txt")
-    os.rename("temp_supplier.txt", "supplier.txt")
     print("Profile Updated Successfully")
 
 
@@ -220,7 +224,7 @@ def add_supplier(current_supplier):
             break
     supplier_address = input("Enter Supplier {} Address: ".format(current_supplier))
     while True:
-        if supplier_name == "":
+        if supplier_address == "":
             print("Invalid Supplier Address")
             supplier_address = input("Enter Supplier {} Address: ".format(current_supplier))
         else:
@@ -228,11 +232,10 @@ def add_supplier(current_supplier):
     supplier_file_object.write("{},{},{}".format(supplier_code, supplier_name, supplier_address))
     supplier_file_object.write("\n")
     supplier_file_object.close()
-    print("Supplier {} Added Successfully".format(current_supplier))
+    print("Supplier {} Added Successfully\n".format(current_supplier))
 
 
 def supplier_registration():
-    print("Supplier Registration, all old data will be override")
     min_supplier = 3
     max_supplier = 4
     current_supplier = 1
@@ -280,10 +283,10 @@ def add_hospital(current_hospital):
     hospital_file_object.write("{},{}".format(hospital_code, hospital_name))
     hospital_file_object.write("\n")
     hospital_file_object.close()
+    print("Hospital {} Added Successfully\n".format(current_hospital))
 
 
 def hospital_registration():
-    print("Hospital Registration, all old data will be override")
     min_hospital = 3
     max_hospital = 4
     current_hospital = 1
@@ -307,18 +310,21 @@ def hospital_registration():
 
 def show_supplier_list():
     supplier_file_object = open("supplier.txt", "r")
-    print("{:<15} {:<8} {:<8}".format("Supplier Code", "Supplier Name", "Supplier Address"))
-    print("-" * 40)
+    print("{:<15} {:<15} {:<8}".format("Supplier Code", "Supplier Name", "Supplier Address"))
+    print("-" * 50)
     for supplier_details in supplier_file_object:
         supplier_details = supplier_details.rstrip()
         supplier_details = supplier_details.split(",")
-        print("{:<15} {:<8} {:<8}".format(supplier_details[0], supplier_details[1], supplier_details[2]))
+        print("{:<15} {:<15} {:<8}".format(supplier_details[0], supplier_details[1], supplier_details[2]))
     supplier_file_object.close()
 
 
-def add_item():
+def add_item(flexible_quantity):
     ppe_file_object = open("ppe.txt", "a")
+    print("-" * 50)
     show_supplier_list()
+    print("-" * 50)
+    print()
     supplier_code = input("Which Supplier Code you want to assign to: ")
     while True:
         if supplier_code == "":
@@ -350,16 +356,34 @@ def add_item():
             item_code = input("Enter Item Name: ")
         else:
             break
-    ppe_file_object.write("{},{},{}".format(supplier_code, item_code, 100))
+    if flexible_quantity:
+        item_quantity = input("Enter Item Quantity: ")
+        while True:
+            if item_quantity == "":
+                print("Item Quantity cannot be empty")
+                item_quantity = input("Enter Item Quantity: ")
+            else:
+
+                try:
+                    item_quantity = int(item_quantity)
+                    break
+                except:
+                    print("Item Quantity must be a number")
+                    item_quantity = input("Enter Item Quantity: ")
+        print('Added {} with quantity {} to supplier {}'.format(item_code, item_quantity, supplier_code))
+    else:
+        item_quantity = 100
+        print('Added {} with quantity {} to supplier {}'.format(item_code, 100, supplier_code))
+    ppe_file_object.write("{},{},{}".format(supplier_code, item_code, item_quantity))
     ppe_file_object.write("\n")
     ppe_file_object.close()
-    print('Added {} with quantity {} to supplier {}'.format(item_code, 100, supplier_code))
 
 
-def inventory_creation():
+
+def inventory_creation(flexible_quantity = False):
     continue_add_item = True
     while continue_add_item:
-        add_item()
+        add_item(flexible_quantity)
         continue_ask_confirm = True
         while continue_ask_confirm:
             break_process = input("Want to add next item? [0-no 1-yes]: ")
@@ -373,7 +397,6 @@ def inventory_creation():
             else:
                 continue_ask_confirm = True
                 print("Invalid Input, only accept 0 and 1")
-    print("Initialized Inventory")
 
 
 def add_item_to_inventory(supplier_code):
@@ -524,14 +547,18 @@ def distribution_module(supplier_code):
                 print("Invalid Input, only accept 0 and 1")
 
 
-def retrieve_all_based_on_supplier(supplier_code):
+def retrieve_all_based_on_supplier(supplier_code, less_than_threshold = False):
     ppe_file_object = open("ppe.txt", "r")
     item_to_show = []
     for ppe_details in ppe_file_object:
         ppe_details = ppe_details.rstrip()
         ppe_details = ppe_details.split(",")
         if ppe_details[0] == supplier_code:
-            item_to_show.append([ppe_details[0], ppe_details[1], ppe_details[2]])
+            if less_than_threshold:
+                if int(ppe_details[2]) < 25:
+                    item_to_show.append(ppe_details)
+            else:
+                item_to_show.append(ppe_details)
     return item_to_show
 
 
@@ -566,29 +593,23 @@ def retrieve_item_history(supplier_code):
 
 
 def display_item(items_list):
+    print()
+    print("-" * 50)
+    print("View Stocks")
+    print("-" * 50)
     print("{:<15} {:<8} {:<8}".format("Supplier Code", "Item Code", "Quantity"))
     for item in items_list:
-        if int(item[2]) < 25:
-            print("{:<15} {:<8} {:<8}".format(item[0], item[1], item[2]))
+        print("{:<15} {:<8} {:<8}".format(item[0], item[1], item[2]))
+    print()
 
-
-def supplier_tracking_module():
-    supplier_code = input("Enter Supplier Code: ")
-    while True:
-        if supplier_code == "":
-            print("Supplier Code cannot be empty")
-            supplier_code = input("Enter Supplier Code: ")
-        else:
-            is_valid_supplier = check_is_supplier_code_valid(supplier_code)
-            if is_valid_supplier:
-                break
-            else:
-                print("Supplier not found")
-                supplier_code = input("Enter Supplier Code: ")
+def supplier_tracking_module(supplier_code):
+    print()
+    print("-" * 50)
     print("Tracking Module")
-    print("\t1. View All Stock")
-    print("\t2. View Stock which less than 25")
-    print("\t3. Search Distributed Item based on Item Id")
+    print("-" * 50)
+    print("1. View All Stock")
+    print("2. View Stock which less than 25")
+    print("3. Search Distributed Item based on Item Id")
     while True:
         option = input("Enter Option: ")
         try:
@@ -604,23 +625,34 @@ def supplier_tracking_module():
         if len(items_list) > 0:
             display_item(items_list)
         else:
+            print()
+            print("-" * 50)
             print("No Data")
+            print("-" * 50)
+            print()
     elif option == 2:
-        items_list = retrieve_all_based_on_supplier(supplier_code)
+        items_list = retrieve_all_based_on_supplier(supplier_code, True)
         if len(items_list) > 0:
             display_item(items_list)
         else:
+            print()
+            print("-" * 50)
             print("No Data")
+            print("-" * 50)
+            print()
     elif option == 3:
         retrieve_item_history(supplier_code)
 
 
 def supplier_menu(supplier_name, supplier_code):
+    print("-" * 50)
+    print("Inventory System")
+    print("-" * 50)
     print("---Welcome {}, Code: {}---".format(supplier_name, supplier_code))
-    print("\t1. Distribute Stock to Hospital")
-    print("\t2. Inventory Tracking")
-    print("\t3. Profile Update")
-    print("\t4. Log Out")
+    print("1. Distribute Stock to Hospital")
+    print("2. Inventory Tracking")
+    print("3. Profile Update")
+    print("4. Log Out")
     while True:
         option = input("Enter Option: ")
         try:
@@ -663,43 +695,68 @@ def env_init():
 
 if __name__ == "__main__":
     env_init()
+    print()
     print("---Inventory System---")
     is_first_time = True
     is_logged_in = False
+    current_logged_in_supplier_code = ""
+    current_logged_in_supplier_name = ""
     while True:
         if is_first_time:
+            print()
+            print("-" * 50)
             print("First time setup, need to register 3 or 4 suppliers account first and initialize their inventory")
+            print("Supplier Registration, all old data will be override")
+            print("-" * 50)
+            print()
             supplier_registration()
+            print()
+            print("-" * 50)
             print("Done supplier registration, next is initialize inventory")
             inventory_creation()
+            print()
+            print("-" * 50)
             print("Done inventory creation, 3 or 4 hospital needed to register")
+            print("Hospital Registration, all old data will be override")
+            print("-" * 50)
+            print()
             hospital_registration()
             is_first_time = False
         else:
-            print("\t1. Supplier Registration")
-            print("\t2. Hospital Registration")
-            print("\t3. Supplier Login")
-            print("\t4. Assign Item to Supplier")
-            print("\t5. Exit")
-            while True:
-                option = input("Enter Option: ")
-                try:
-                    option = int(option)
-                    if option == 1 or option == 2 or option == 3 or option == 4 or option == 5:
-                        break
-                    else:
-                        print("Invalid Option")
-                except:
-                    print("Option must be a number")
-            if option == 1:
-                supplier_registration()
-            elif option == 2:
-                hospital_registration()
-            elif option == 3:
-                supplier_code, supplier_name = supplier_login()
-                supplier_menu(supplier_name, supplier_code)
-            elif option == 4:
-                inventory_creation()
-            elif option == 5:
-                print("Thank you, bye")
-                exit()
+            if is_logged_in:
+                supplier_menu(current_logged_in_supplier_name, current_logged_in_supplier_code)
+            else:
+                print("-" * 50)
+                print("Inventory System")
+                print("-" * 50)
+                # print("1. Supplier Registration")
+                # print("2. Hospital Registration")
+                print("1. Supplier Login")
+                print("2. Assign Item to Supplier")
+                print("3. Exit")
+                while True:
+                    option = input("Enter Option: ")
+                    try:
+                        option = int(option)
+                        if option == 1 or option == 2 or option == 3:
+                            break
+                        else:
+                            print("Invalid Option")
+                    except:
+                        print("Option must be a number")
+                # if option == 1:
+                #     supplier_registration()
+                # elif option == 2:
+                #     hospital_registration()
+                if option == 1:
+                    supplier_code, supplier_name = supplier_login()
+                    supplier_menu(supplier_name, supplier_code)
+                    is_logged_in = True
+                    current_logged_in_supplier_code = supplier_code
+                    current_logged_in_supplier_name = supplier_name
+
+                elif option == 2:
+                    inventory_creation(True)
+                elif option == 3:
+                    print("Thank you, bye")
+                    exit()
