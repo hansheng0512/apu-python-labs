@@ -26,7 +26,7 @@ END
 FUNCTION get_input_supplier_code(check_is_exist=False)
   PRINT "Enter supplier code"
   READ supplier_code
-  WHILE True
+  DOWHILE True
     IF supplier_code == "" THEN
       PRINT "Supplier Code cannot be empty"
       PRINT "Enter supplier code"
@@ -51,7 +51,7 @@ ENDFUNCTION
 FUNCTION get_string_input(title)
   PRINT "Enter" + title
   READ string_input
-  WHILE True
+  DOWHILE True
     IF string_input = "" THEN
       PRINT title + "cannot be empty"
       PRINT "Enter" + title
@@ -92,4 +92,43 @@ FUNCTION update_supplier_details()
   CLOSE initial_supplier_file_object
   CLOSE temp_supplier_file_object
   PRINT "Profile Updated Successfully"
+ENDFUNCTION
+
+
+FUNCTION sort_and_filter_item_search(supplier_code_list, target_hospital_list, quantity_list, item_code_list)
+  DECLARE List supplier_code_list_to_show
+  DECLARE List target_hospital_list_to_show
+  DECLARE List quantity_list_to_show
+  DECLARE List item_code_list_to_show
+  DOWHILE LENGTH OF supplier_code_list > 0
+    ref1 = supplier_code_list.pop(0)
+    ref2 = target_hospital_list.pop(0)
+    ref3 = quantity_list.pop(0)
+    ref4 = item_code_list.pop(0)
+    j = 0
+    DOWHILE LENGTH OF supplier_code_list > 0
+      data1 = supplier_code_list[j]
+      data2 = target_hospital_list[j]
+      data3 = quantity_list[j]
+      data4 = item_code_list[j]
+      IF data1 == ref1 AND data2 == ref2 AND data4 == ref4 THEN
+        ref3 = ref3 + data3
+        supplier_code_list.pop(j)
+        target_hospital_list.pop(j)
+        quantity_list.pop(j)
+        item_code_list.pop(j)
+        CONTINUE
+      ENDIF
+      j += 1
+    ENDDO
+    APPEND ref1 TO supplier_code_list_to_show
+    APPEND ref2 TO target_hospital_list_to_show
+    APPEND ref3 TO quantity_list_to_show
+    APPEND ref4 TO item_code_list_to_show
+  ENDDO
+  index = 0
+  FOREACH supplier_code IN supplier_code_list_to_show
+    PRINT supplier_code, target_hospital_list_to_show[index], quantity_list_to_show[index], item_code_list_to_show[index]
+    index = index + 1
+  ENDFOR
 ENDFUNCTION
