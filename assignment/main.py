@@ -1,4 +1,7 @@
 def update_supplier_details():
+    """
+    This function will update the supplier details
+    """
     supplier_code = get_input_supplier_code()
     supplier_new_name = get_string_input("New Supplier Name")
     supplier_new_address = get_string_input("New Supplier Address")
@@ -31,6 +34,13 @@ def update_supplier_details():
 
 
 def sort_and_filter_item_search(supplier_code_list, target_hospital_list, quantity_list, item_code_list):
+    """
+    This function will sort and filter the item list
+    :param supplier_code_list: List of Supplier Code
+    :param target_hospital_list:  List of Hospital Code
+    :param quantity_list: List of Quantity Code
+    :param item_code_list: List if Item Code
+    """
     supplier_code_list_to_show = []
     target_hospital_list_to_show = []
     quantity_list_to_show = []
@@ -68,6 +78,9 @@ def sort_and_filter_item_search(supplier_code_list, target_hospital_list, quanti
 
 
 def retrieve_item_history():
+    """
+    This function will retrieve the distributed item and display the history
+    """
     supplier_code = get_input_supplier_code()
     item_code = get_input_item_code(True)
     distribution_file_object = open("distribution.txt", "r")
@@ -87,6 +100,14 @@ def retrieve_item_history():
 
 
 def update_stock(supplier_code, item_code, new_quantity, action):
+    """
+    This function will update the stock of the item based on confition
+    :param supplier_code: supplier code
+    :param item_code: item code
+    :param new_quantity: quantity to be updated
+    :param action: MINUS/ADD
+    :return:
+    """
     initial_ppe_file_object = open("ppe.txt", "r")
     initial_ppe_file_object_list = []
     if action == "MINUS":
@@ -117,17 +138,17 @@ def update_stock(supplier_code, item_code, new_quantity, action):
         temp_ppe_file_object = open("ppe.txt", "w")
         for initial_ppe_file_item in initial_ppe_file_object_list:
             temp_ppe_file_object.write(initial_ppe_file_item + "\n")
-    else:
-        for initial_item_details in initial_ppe_file_object:
-            initial_item_details = initial_item_details.rstrip()
-            initial_item_details = initial_item_details.split(",")
-            initial_ppe_file_object_list.append("{},{},{},{}".format(initial_item_details[0], initial_item_details[1], initial_item_details[2]), supplier_code)
-        temp_ppe_file_object = open("ppe.txt", "w")
-        for initial_ppe_file_item in initial_ppe_file_object_list:
-            temp_ppe_file_object.write(initial_ppe_file_item + "\n")
-        temp_ppe_file_object.write(
-            "{},{},{},{}".format(supplier_code, item_code, new_quantity, supplier_code))
-        temp_ppe_file_object.write("\n")
+    # else:
+    #     for initial_item_details in initial_ppe_file_object:
+    #         initial_item_details = initial_item_details.rstrip()
+    #         initial_item_details = initial_item_details.split(",")
+    #         initial_ppe_file_object_list.append("{},{},{},{}".format(initial_item_details[0], initial_item_details[1], initial_item_details[2]), supplier_code)
+    #     temp_ppe_file_object = open("ppe.txt", "w")
+    #     for initial_ppe_file_item in initial_ppe_file_object_list:
+    #         temp_ppe_file_object.write(initial_ppe_file_item + "\n")
+    #     temp_ppe_file_object.write(
+    #         "{},{},{},{}".format(supplier_code, item_code, new_quantity, supplier_code))
+    #     temp_ppe_file_object.write("\n")
 
     initial_ppe_file_object.close()
     temp_ppe_file_object.close()
@@ -135,6 +156,13 @@ def update_stock(supplier_code, item_code, new_quantity, action):
 
 
 def check_item_stock_is_enough(supplier_code, item_code, quantity_needed):
+    """
+    This function will check the stock of the item is enough or not
+    :param supplier_code: supplier code
+    :param item_code: ttem code
+    :param quantity_needed: quantity needed, use to compare with stock in database
+    :return:
+    """
     ppe_file_object = open("ppe.txt", "r")
     for ppe_details in ppe_file_object:
         ppe_details = ppe_details.rstrip()
@@ -148,6 +176,9 @@ def check_item_stock_is_enough(supplier_code, item_code, quantity_needed):
 
 
 def distribution_process():
+    """
+    This function will process the distribution record and update the stock
+    """
     distribution_file_object = open("distribution.txt", "a")
     supplier_code = get_input_supplier_code(True)
 
@@ -171,6 +202,9 @@ def distribution_process():
 
 
 def distribution_module():
+    """
+    This function will process the distribution module
+    """
     distribute_item = True
     while distribute_item:
         distribution_process()
@@ -190,6 +224,9 @@ def distribution_module():
 
 
 def view_stock_less_than_twenty_five():
+    """
+    This function will view the stock less than 25 based on supplier code
+    """
     supplier_code = get_input_supplier_code()
     items_list = retrieve_all_based_on_supplier(supplier_code, True)
     if len(items_list) > 0:
@@ -199,6 +236,10 @@ def view_stock_less_than_twenty_five():
 
 
 def display_item(items_list):
+    """
+    This function will display the item list
+    :param items_list: nested item list
+    """
     print()
     print("-" * 50)
     print("View Stocks")
@@ -210,6 +251,12 @@ def display_item(items_list):
 
 
 def retrieve_all_based_on_supplier(supplier_code, less_than_threshold = False):
+    """
+    This function will retrieve all the item based on supplier code
+    :param supplier_code: supplier code
+    :param less_than_threshold: if True only retrieve the item less than 25, else will retrieve all item
+    :return:
+    """
     ppe_file_object = open("ppe.txt", "r")
     item_to_show = []
     for ppe_details in ppe_file_object:
@@ -225,6 +272,9 @@ def retrieve_all_based_on_supplier(supplier_code, less_than_threshold = False):
 
 
 def view_all_stock():
+    """
+    This function will view all the stock
+    """
     supplier_code = get_input_supplier_code()
     items_list = retrieve_all_based_on_supplier(supplier_code)
     if len(items_list) > 0:
@@ -234,6 +284,10 @@ def view_all_stock():
 
 
 def add_item(flexible_quantity):
+    """
+    This function will add the stock to supplier
+    :param flexible_quantity: if True, will update the quantity based on the input, else will update the quantity with 100
+    """
     supplier_code = get_input_supplier_code(True)
     if flexible_quantity:
         item_code = get_input_item_code(True, False)
@@ -255,6 +309,10 @@ def add_item(flexible_quantity):
 
 
 def inventory_creation(flexible_quantity = False):
+    """
+    This function will create the assign item to supplier
+    :param flexible_quantity: if True, will update the quantity based on the input, else will update the quantity with 100
+    """
     continue_add_item = True
     while continue_add_item:
         add_item(flexible_quantity)
@@ -350,6 +408,11 @@ def get_input_supplier_code(check_is_exist = False):
 
 
 def get_number_input(title):
+    """
+    Function to ask valid number input
+    :param title: title
+    :return: valid input from user
+    """
     number_input = input("Enter {}: ".format(title))
     while True:
         if number_input == "":
@@ -367,7 +430,8 @@ def get_number_input(title):
 def get_string_input(title):
     """
     Function to ask valid string input
-    :return: valid string input from user
+    :param title: title
+    :return: valid input from user
     """
     string_input = input("Enter {}: ".format(title))
     while True:
@@ -382,7 +446,7 @@ def check_is_code_exist(target_code, target):
     """
     Function to check if supplier/hospital/item code is valid
     :param target_code: supplier code/hospital code/item code
-    :param target: HOSPITAL or SUPPLIRER or ITEM
+    :param target: HOSPITAL/SUPPLIRER/ITEM
     :return: return True if exist, False if not
     """
     if target == "SUPPLIER":
@@ -396,6 +460,7 @@ def check_is_code_exist(target_code, target):
         details = details.split(",")
         if details[0] == target_code:
             return True
+    file_object.close()
     return False
 
 
@@ -449,6 +514,10 @@ def supplier_registration():
 
 
 def add_hospital(current_hospital):
+    """
+    Function to add hospital
+    :param current_hospital: current hospital
+    """
     hospital_file_object = open("hospital.txt", "a")
     hospital_code = get_input_hospital_code()
     hospital_name = get_string_input("Hospital Name")
@@ -460,6 +529,9 @@ def add_hospital(current_hospital):
 
 
 def hospital_registration():
+    """
+    Function to register hospital
+    """
     min_hospital = 3
     max_hospital = 4
     current_hospital = 1
@@ -487,6 +559,10 @@ def hospital_registration():
 
 
 def main_menu():
+    """
+    Function to display main menu
+    :return:
+    """
     while True:
         print("-" * 50)
         print("Inventory System")
