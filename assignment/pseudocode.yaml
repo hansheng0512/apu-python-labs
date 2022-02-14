@@ -1,0 +1,95 @@
+FUNCTION check_is_code_exist(target_code, target)
+  DECLARE String Filename
+  DECLARE String Line
+  DECLARE File file_object
+  IF target == "SUPPLIER" THEN
+    Filename = "supplier.txt" 
+  ENDIF
+  IF target == "HOSPITAL" THEN
+    Filename = "hospital.txt"
+  ENDIF
+  IF target == "ITEM" THEN
+    Filename = "ppe.txt"
+  ENDIF
+  file_object = OPENFILE Filename FOR READ
+  FOREACH details IN file_object
+    READ details
+    details = details.split(",")
+    IF details[0] = target_code THEN
+      RETURN True
+  ENDFOR
+  CLOSE Filename
+  RETURN False
+END
+
+
+FUNCTION get_input_supplier_code(check_is_exist=False)
+  PRINT "Enter supplier code"
+  READ supplier_code
+  WHILE True
+    IF supplier_code == "" THEN
+      PRINT "Supplier Code cannot be empty"
+      PRINT "Enter supplier code"
+      READ supplier_code
+    ELSE
+      IF check_is_exist == True THEN
+        is_valid_supplier = CALL check_is_code_exist(supplier_code, "SUPPLIER")
+        IF is_valid_supplier THEN
+          RETURN supplier_code
+        ELSE
+          PRINT "Supplier not found"
+          PRINT "Enter supplier code"
+          READ supplier_code
+      ELSE
+        RETURN supplier_code
+      ENDIF
+    ENDIF
+  ENDWHILE
+ENDFUNCTION
+
+
+FUNCTION get_string_input(title)
+  PRINT "Enter" + title
+  READ string_input
+  WHILE True
+    IF string_input = "" THEN
+      PRINT title + "cannot be empty"
+      PRINT "Enter" + title
+      READ string_input
+    ELSE
+      RETURN string_input
+    ENDIF
+  ENDWHILE
+ENDFUNCTION
+
+
+FUNCTION update_supplier_details()
+  DECLARE File initial_supplier_file_object
+  DECLARE String supplier_code_to_save
+  supplier_code = CALL get_input_supplier_code()
+  supplier_new_name = CALL get_string_input("New Supplier Name")
+  supplier_new_address = CALL get_string_input("New Supplier Address")
+  initial_supplier_file_object = OPENFILE "supplier.txt" FOR READ
+  DECLARE List initial_supplier_file_object_list
+  FOREACH initial_supplier_details IN initial_supplier_file_object
+    initial_supplier_details = initial_supplier_details.rstrip()
+    initial_supplier_details = initial_supplier_details.split(",")
+    supplier_code_to_save = supplier_code
+    IF initial_supplier_details[0] = supplier_code THEN
+      supplier_name_to_save = supplier_new_name
+      supplier_address_to_save = supplier_new_address
+    ELSE
+      supplier_name_to_save = initial_supplier_details[1]
+      supplier_address_to_save = initial_supplier_details[2]
+    ENDIF
+    APPEND [supplier_code_to_save, supplier_name_to_save, supplier_address_to_save] TO initial_supplier_file_object_list
+  ENDFOR
+  temp_supplier_file_object = OPENFILE "supplier.txt" FOR WRITE
+  FOREACH initial_supplier_file_item IN initial_supplier_file_object_list
+    WRITEFILE temp_supplier_file_object, supplier_code_to_save, supplier_name_to_save, supplier_address_to_save
+    WRITEFILE "\n"
+  ENDFOR
+  CLOSE initial_supplier_file_object
+  CLOSE temp_supplier_file_object
+  PRINT "Profile Updated Successfully"
+ENDFUNCTION

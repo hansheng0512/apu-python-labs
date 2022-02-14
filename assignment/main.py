@@ -1,3 +1,63 @@
+def check_is_code_exist(target_code, target):
+    """
+    Function to check if supplier/hospital/item code is valid
+    :param target_code: supplier code/hospital code/item code
+    :param target: HOSPITAL/SUPPLIRER/ITEM
+    :return: return True if exist, False if not
+    """
+    if target == "SUPPLIER":
+        file_object = open("supplier.txt", "r")
+    elif target == "HOSPITAL":
+        file_object = open("hospital.txt", "r")
+    elif target == "ITEM":
+        file_object = open("ppe.txt", "r")
+    for details in file_object:
+        details = details.rstrip()
+        details = details.split(",")
+        if details[0] == target_code:
+            return True
+    file_object.close()
+    return False
+
+
+def get_input_supplier_code(check_is_exist = False):
+    """
+    Function to ask valid supplier code input
+    :param check_is_exist: boolean, check if supplier code exist
+    :return: return supplier code
+    """
+    supplier_code = input("Enter Supplier Code: ")
+    while True:
+        if supplier_code == "":
+            print("Supplier Code cannot be empty")
+            supplier_code = input("Enter Supplier Code: ")
+        else:
+            if check_is_exist:
+                is_valid_supplier = check_is_code_exist(supplier_code, "SUPPLIER")
+                if is_valid_supplier:
+                    return supplier_code
+                else:
+                    print("Supplier not found")
+                    supplier_code = input("Enter Supplier Code: ")
+            else:
+                return supplier_code
+
+
+def get_string_input(title):
+    """
+    Function to ask valid string input
+    :param title: title
+    :return: valid input from user
+    """
+    string_input = input("Enter {}: ".format(title))
+    while True:
+        if string_input == "":
+            print("{} cannot be empty".format(title))
+            string_input = input("Enter {}: ".format(title))
+        else:
+            return string_input
+
+
 def update_supplier_details():
     """
     This function will update the supplier details
@@ -384,29 +444,6 @@ def get_input_item_code(check_is_exist = False, add_item = False):
                 return item_code
 
 
-def get_input_supplier_code(check_is_exist = False):
-    """
-    Function to ask valid supplier code input
-    :param check_is_exist: boolean, check if supplier code exist
-    :return: return supplier code
-    """
-    supplier_code = input("Enter Supplier Code: ")
-    while True:
-        if supplier_code == "":
-            print("Supplier Code cannot be empty")
-            supplier_code = input("Enter Supplier Code: ")
-        else:
-            if check_is_exist:
-                is_valid_supplier = check_is_code_exist(supplier_code, "SUPPLIER")
-                if is_valid_supplier:
-                    return supplier_code
-                else:
-                    print("Supplier not found")
-                    supplier_code = input("Enter Supplier Code: ")
-            else:
-                return supplier_code
-
-
 def get_number_input(title):
     """
     Function to ask valid number input
@@ -425,44 +462,6 @@ def get_number_input(title):
             except:
                 print("{} must be a number".format(title))
                 number_input = input("Enter {}: ".format(title))
-
-
-def get_string_input(title):
-    """
-    Function to ask valid string input
-    :param title: title
-    :return: valid input from user
-    """
-    string_input = input("Enter {}: ".format(title))
-    while True:
-        if string_input == "":
-            print("{} cannot be empty".format(title))
-            string_input = input("Enter {}: ".format(title))
-        else:
-            return string_input
-
-
-def check_is_code_exist(target_code, target):
-    """
-    Function to check if supplier/hospital/item code is valid
-    :param target_code: supplier code/hospital code/item code
-    :param target: HOSPITAL/SUPPLIRER/ITEM
-    :return: return True if exist, False if not
-    """
-    if target == "SUPPLIER":
-        file_object = open("supplier.txt", "r")
-    elif target == "HOSPITAL":
-        file_object = open("hospital.txt", "r")
-    elif target == "ITEM":
-        file_object = open("ppe.txt", "r")
-    for details in file_object:
-        details = details.rstrip()
-        details = details.split(",")
-        if details[0] == target_code:
-            return True
-    file_object.close()
-    return False
-
 
 
 def add_supplier(current_supplier):
