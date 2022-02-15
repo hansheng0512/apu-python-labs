@@ -439,7 +439,6 @@ def add_item(flexible_quantity):
         ppe_file_object.close()
 
 
-
 def inventory_creation(flexible_quantity = False):
     """
     This function will create the assign item to supplier

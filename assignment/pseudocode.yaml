@@ -368,3 +368,37 @@ FUNCTION view_stock_less_than_twenty_five()
     PRINT "No Data"
   ENDIF
 ENDFUNCTION
+
+
+FUNCTION view_all_stock()
+  supplier_code = CALL get_input_supplier_code()
+  items_list = CALL retrieve_all_based_on_supplier(supplier_code)
+  IF LENGTH OF items_list > 0 THEN
+    display_item(items_list)
+  ELSE
+    PRINT "No Data"
+  ENDIF
+ENDFUNCTION
+
+
+FUNCTION add_item(flexible_quantity)
+  supplier_code = CALL get_input_supplier_code(True)
+  IF flexible_quantity THEN
+    item_code = get_input_item_code(True, False)
+  ELSE
+    item_name = get_string_input("Item Name")
+    item_code = get_input_item_code(True, True)
+  ENDIF
+  IF flexible_quantity THEN
+    item_quantity = CALL get_number_input("Item Quantity")
+    PRINT "Added", item_code, "with extra quantity", item_quantity, "to supplier", supplier_code  
+    update_stock(supplier_code, item_code, item_quantity, "ADD")
+  ELSE
+    item_quantity = 100
+    PRINT "Added", item_code, "with quantity", item_quantity, "to supplier", supplier_code 
+    ppe_file_object = OPENFILE "ppe.txt" FOR APPEND
+    WRITEFILE ppe_file_object, item_code, item_name, item_quantity, supplier_code
+    WRITEFILE ppe_file_object, "\n"
+    CLOSE ppe_file_object
+  ENDIF
+ENDFUNCTION
