@@ -291,6 +291,25 @@ FUNCTION get_string_input(title)
 ENDFUNCTION
 
 
+FUNCTION get_number_input(title)
+  PRINT "Enter", title
+  READ title
+  DOWHILE True
+    IF number_input == "" THEN
+      PRINT title, "cannot be empty"
+      PRINT "Enter", title
+    ELSE
+      TRY
+        number_input = int(number_input)
+        RETURN number_input
+      EXCEPT
+        PRINT title, "must be a number"
+        PRINT "Enter", title
+    ENDIF
+  ENDDO
+ENDFUNCTION
+
+
 FUNCTION distribution_process()
   distribution_file_object = OPENFILE "distribution.txt" FOR APPEND
   supplier_code = CALL get_input_supplier_code(True)
@@ -328,7 +347,7 @@ FUNCTION distribution_module()
         continue_ask_confirm = True
         PRINT "Invalid Input, only accept 0 and 1"
       ENDIF
-    ENDFO
+    ENDDO
   ENDDO
 ENDFUNCTION
 
@@ -402,3 +421,177 @@ FUNCTION add_item(flexible_quantity)
     CLOSE ppe_file_object
   ENDIF
 ENDFUNCTION
+
+
+FUNCTION inventory_creation(flexible_quantity = False)
+  continue_add_item = True
+  DOWHILE continue_add_item
+    CALL add_item(flexible_quantity)
+    continue_ask_confirm = True
+    DOWHILE continue_ask_confirm
+      PRINT "Want to distribute next item? [0-no 1-yes]"
+      IF break_process == "0" OR break_process == "1" THEN
+        IF break_process == "0" THEN
+          continue_ask_confirm = False
+          continue_add_item = False
+        ELSE
+          continue_ask_confirm = False
+          continue_add_item = True
+        ENDIF
+      ELSE
+        continue_ask_confirm = True
+        PRINT "Invalid Input, only accept 0 and 1"
+      ENDIF
+    ENDDO
+  ENDDO
+ENDFUNCTION
+
+
+FUNCTION add_supplier(current_supplier)
+  PRINT "Insert Supplier", current_supplier,"Details"
+  supplier_file_object = OPENFILE "supplier.txt" FOR APPEND
+  supplier_code = CALL get_input_supplier_code()
+  supplier_name = CALL get_string_input("Supplier Name")
+  supplier_address = CALL get_string_input("Supplier Address")
+  WRITEFILE supplier_file_object, supplier_code, supplier_name, supplier_address
+  WRITEFILE supplier_file_object "\n"
+  CLOSE supplier_file_object
+  PRINT "Supplier", current_supplier,"Added Successfully\n"
+ENDFUNCTION
+
+
+FUNCTION supplier_registration()
+  PRINT "Supplier Registration"
+  PRINT "All previous supplier details will be overwritten"
+  min_supplier = 3
+  max_supplier = 4
+  current_supplier = 1
+  file_object = OPENFILE "supplier.txt" FOR WRITE
+  file_object.close()
+  DOWHILE current_supplier <= max_supplier
+    CALL add_supplier(current_supplier)
+    IF current_supplier == min_supplier THEN
+      continue_ask_confirm = True
+      DOWHILE continue_ask_confirm
+        PRINT "Want to add 4th supplier? [0-no 1-yes]"
+        IF break_process == "0" OR break_process == "1" THEN
+          IF break_process == "0" THEN
+            continue_ask_confirm = False
+            current_supplier = 5
+          ELSE
+            continue_ask_confirm = False
+          ENDIF
+        ELSE
+          continue_ask_confirm = True
+          PRINT "Invalid Input, only accept 0 and 1"
+        ENDIF
+      ENDDO
+    ENDIF
+  ENDDO
+ENDFUNCTION
+
+
+FUNCTION add_hospital(current_hospital)
+  PRINT "Insert Hospital", current_hospital,"Details"
+  hospital_file_object = OPENFILE "hospital.txt" FOR APPEND
+  hospital_code = CALL get_input_supplier_code()
+  hospital_name = CALL get_string_input("Hospital Name")
+  hospital_address = CALL get_string_input("Hospital Address")
+  WRITEFILE hospital_file_object, hospital_code, hospital_name, hospital_address
+  WRITEFILE hospital_file_object "\n"
+  CLOSE hospital_file_object
+  PRINT "Hospital", current_hospital,"Added Successfully\n"
+ENDFUNCTION
+
+
+FUNCTION hospital_registration()
+  PRINT "Supplier Registration"
+  PRINT "All previous supplier details will be overwritten"
+  min_hospital = 3
+  max_hospital = 4
+  current_hospital = 1
+  file_object = OPENFILE "hospital.txt" FOR WRITE
+  file_object.close()
+  DOWHILE current_hospital <= max_hospital
+    CALL add_hospital(current_hospital)
+    IF current_hospital == min_hospital THEN
+      continue_ask_confirm = True
+      DOWHILE continue_ask_confirm
+        PRINT "Want to add 4th hospital? [0-no 1-yes]"
+        IF break_process == "0" OR break_process == "1" THEN
+          IF break_process == "0" THEN
+            continue_ask_confirm = False
+            current_supplier = 5
+          ELSE
+            continue_ask_confirm = False
+          ENDIF
+        ELSE
+          continue_ask_confirm = True
+          PRINT "Invalid Input, only accept 0 and 1"
+        ENDIF
+      ENDDO
+    ENDIF
+  ENDDO
+ENDFUNCTION
+
+
+FUNCTION main_menu()
+  DOWHILE True
+    PRINT "Inventory System"
+    PRINT "1. Supplier Registration"
+    PRINT "2. Hospital Registration"
+    PRINT "3. Add New Item for Supplier"
+    PRINT "4. View All Stock"
+    PRINT "5. View Stock which Less Than 25"
+    PRINT "6. Distribute Item to Hospital"
+    PRINT "7. Search Item based on Item Code"
+    PRINT "8. Supplier Profile Update"
+    PRINT "9. Update Supplier Existing Stock"
+    PRINT "10. Exit"
+    DOWHILE True
+      PRINT "Enter Option"
+      READ option
+      IF 1 <= option <= 10 THEN
+        IF option == 1 THEN
+          supplier_registration()
+        ENDIF
+        IF option == 2 THEN
+          hospital_registration()
+        ENDIF
+        IF option == 3 THEN
+          inventory_creation()
+        ENDIF
+        IF option == 4 THEN
+          view_all_stock()
+        ENDIF
+        IF option == 5 THEN
+          view_stock_less_than_twenty_five()
+        ENDIF
+        IF option == 6 THEN
+          view_stock_less_than_twenty_five()
+        ENDIF
+        IF option == 7 THEN
+          retrieve_item_history()
+        ENDIF
+        IF option == 8 THEN
+          update_supplier_details()
+        ENDIF
+        IF option == 9 THEN
+          inventory_creation()
+        ENDIF
+        IF option == 10 THEN
+          PRINT "Bye"
+          BREAK
+        ENDIF
+      ELSE
+        PRINT "Invalid Option"
+      ENDIF
+    ENDDO
+  ENDDO
+ENDFUNCTION
+
+
+PROGRAM inventory_system
+BEGIN
+  CALL main_menu()
+END

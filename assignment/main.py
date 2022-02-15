@@ -515,6 +515,7 @@ def add_hospital(current_hospital):
     Function to add hospital
     :param current_hospital: current hospital
     """
+    print("Insert Hospital {} Details".format(current_hospital))
     hospital_file_object = open("hospital.txt", "a")
     hospital_code = get_input_hospital_code()
     hospital_name = get_string_input("Hospital Name")
@@ -529,6 +530,8 @@ def hospital_registration():
     """
     Function to register hospital
     """
+    print("Hospital Registration")
+    print("All previous hospital details will be overwritten")
     min_hospital = 3
     max_hospital = 4
     current_hospital = 1
@@ -558,7 +561,6 @@ def hospital_registration():
 def main_menu():
     """
     Function to display main menu
-    :return:
     """
     while True:
         print("-" * 50)
@@ -574,38 +576,36 @@ def main_menu():
         print("8. Supplier Profile Update")
         print("9. Update Supplier Existing Stock")
         print("10. Exit")
-        while True:
-            option = input("Enter Option: ")
-            try:
-                option = int(option)
-                if option == 1 or option == 2 or option == 3 or option == 4 or option == 5 or option == 6 or option == 7 or option == 8 or option == 9 or option == 10:
+        option = input("Enter Option: ")
+        try:
+            option = int(option)
+            if 1 <= option <= 10:
+                if option == 1:
+                    supplier_registration()
+                elif option == 2:
+                    hospital_registration()
+                elif option == 3:
+                    inventory_creation()
+                elif option == 4:
+                    view_all_stock()
+                elif option == 5:
+                    view_stock_less_than_twenty_five()
+                elif option == 6:
+                    distribution_module()
+                elif option == 7:
+                    retrieve_item_history()
+                elif option == 8:
+                    update_supplier_details()
+                elif option == 9:
+                    inventory_creation(True)
+                elif option == 10:
+                    print("Bye")
                     break
-                else:
-                    print("Invalid Option")
-            except:
-                print("Option must be a number")
+            else:
+                print("Invalid Option")
+        except:
+            print("Option must be a number")
 
-        if option == 1:
-            supplier_registration()
-        elif option == 2:
-            hospital_registration()
-        elif option == 3:
-            inventory_creation()
-        elif option == 4:
-            view_all_stock()
-        elif option == 5:
-            view_stock_less_than_twenty_five()
-        elif option == 6:
-            distribution_module()
-        elif option == 7:
-            retrieve_item_history()
-        elif option == 8:
-            update_supplier_details()
-        elif option == 9:
-            inventory_creation(True)
-        elif option == 10:
-            print("Bye")
-            exit()
 
 if __name__ == '__main__':
     main_menu()
