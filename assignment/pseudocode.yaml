@@ -40,6 +40,7 @@ FUNCTION get_input_supplier_code(check_is_exist=False)
           PRINT "Supplier not found"
           PRINT "Enter supplier code"
           READ supplier_code
+        ENDIF
       ELSE
         RETURN supplier_code
       ENDIF
@@ -134,4 +135,41 @@ FUNCTION sort_and_filter_item_search(supplier_code_list, target_hospital_list, q
 ENDFUNCTION
 
 
-FUNCTION retrieve_item_history
+FUNCTION get_input_item_code(check_is_exist = False, add_item = False)
+  PRINT "Enter item code"
+  READ item_code
+  DOWHILE True
+    IF item_code == "" THEN
+      PRINT "Item code cannot be empty"
+      PRINT "Enter item code"
+      READ item_code
+    ELSE
+      IF check_is_exist == True THEN
+        is_valid_item = CALL check_is_code_exist(supplier_code, "ITEM")
+        IF is_valid_item THEN
+          IF add_item THEN
+            PRINT "This item already assigned to another supplier"
+            PRINT "Enter item code"
+            READ item_code
+          ELSE
+            READ item_code
+          ENDIF
+        ELSE
+          IF add_item THEN
+            RETURN item_code
+          PRINT "Item not found"
+          PRINT "Enter item code"
+          READ item_code
+        ENDIF
+      ELSE
+        RETURN item_code
+      ENDIF
+    ENDIF
+  ENDWHILE
+ENDFUNCTION
+
+
+FUNCTION retrieve_item_history()
+  supplier_code = CALL get_input_supplier_code()
+  item_code = CALL get_input_item_code(True)
+ENDFUNCTION

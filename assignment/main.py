@@ -137,6 +137,35 @@ def sort_and_filter_item_search(supplier_code_list, target_hospital_list, quanti
         index = index + 1
 
 
+def get_input_item_code(check_is_exist = False, add_item = False):
+    """
+    Function to ask valid item code input
+    :param check_is_exist: boolean, check if item code exist
+    :return: return item code
+    """
+    item_code = input("Enter item Code: ")
+    while True:
+        if item_code == "":
+            print("Item code cannot be empty")
+            item_code = input("Enter item code: ")
+        else:
+            if check_is_exist:
+                is_valid_item = check_is_code_exist(item_code, "ITEM")
+                if is_valid_item:
+                    if add_item:
+                        print("This item already assigned to another supplier")
+                        item_code = input("Enter Item Code: ")
+                    else:
+                        return item_code
+                else:
+                    if add_item:
+                        return item_code
+                    print("Item not found")
+                    item_code = input("Enter Item Code: ")
+
+            else:
+                return item_code
+
 def retrieve_item_history():
     """
     This function will retrieve the distributed item and display the history
@@ -412,36 +441,6 @@ def get_input_hospital_code(check_is_exist = False):
                     hospital_code = input("Enter Hospital Code: ")
             else:
                 return hospital_code
-
-
-def get_input_item_code(check_is_exist = False, add_item = False):
-    """
-    Function to ask valid item code input
-    :param check_is_exist: boolean, check if item code exist
-    :return: return item code
-    """
-    item_code = input("Enter Item Code: ")
-    while True:
-        if item_code == "":
-            print("Item Code cannot be empty")
-            item_code = input("Enter Item Code: ")
-        else:
-            if check_is_exist:
-                is_valid_item = check_is_code_exist(item_code, "ITEM")
-                if is_valid_item:
-                    if add_item:
-                        print("This item already assigned to another supplier")
-                        item_code = input("Enter Item Code: ")
-                    else:
-                        return item_code
-                else:
-                    if add_item:
-                        return item_code
-                    print("Item not found")
-                    item_code = input("Enter Item Code: ")
-
-            else:
-                return item_code
 
 
 def get_number_input(title):
