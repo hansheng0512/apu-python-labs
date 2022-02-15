@@ -184,8 +184,67 @@ FUNCTION retrieve_item_history()
       APPEND distribution_details[0] TO supplier_code_list
       APPEND distribution_details[1] TO target_hospital_list
       APPEND distribution_details[2] TO item_code_list
-      APPEND int(distribution_details[3]) TO quantity_list
+      APPEND distribution_details[3] TO quantity_list
     ENDIF
   ENDFOR
   CALL sort_and_filter_item_search(supplier_code_list, target_hospital_list, quantity_list, item_code_list)
+ENDFUNCTION
+
+
+FUNCTION update_stock(supplier_code, item_code, new_quantity, action)
+  initial_ppe_file_object = OPENFILE "ppe.txt" FOR READ
+  DECLARE List initial_ppe_file_object_list
+  IF action == "MINUS"
+    FOREACH initial_item_details IN initial_ppe_file_object
+      initial_item_details = initial_item_details.rstrip()
+      initial_item_details = initial_item_details.split(",")
+      IF initial_item_details[3] == supplier_code AND initial_item_details[0] == item_code
+        final_quantity = initial_item_details[2] - new_quantity
+      ELSE
+        final_quantity = initial_item_details[2]
+      ENDIF
+      WRITEFILE temp_supplier_file_object, initial_item_details[0], initial_item_details[1], final_quantity, supplier_code
+      WRITEFILE "\n"
+    ENDFOR
+    temp_ppe_file_object = OPENFILE "supplier.txt" FOR WRITE
+    FOREACH initial_item_details IN initial_ppe_file_object
+      WRITEFILE temp_supplier_file_object, initial_item_details
+      WRITEFILE "\n"
+    ENDFOR
+  ENDIF
+  IF action == "ADD"
+    FOREACH initial_item_details IN initial_ppe_file_object
+      initial_item_details = initial_item_details.rstrip()
+      initial_item_details = initial_item_details.split(",")
+      IF initial_item_details[3] == supplier_code AND initial_item_details[0] == item_code
+        APPEND initial_item_details[0], initial_item_details[1], str(int(initial_item_details[2]) + new_quantity), supplier_code TO initial_ppe_file_object_list
+      ELSE
+        APPEND initial_item_details[0], initial_item_details[1], initial_item_details[2], supplier_code TO initial_ppe_file_object_list
+      ENDIF
+    ENDFOR
+    temp_ppe_file_object = OPENFILE "ppe.txt" FOR WRITE
+    FOREACH initial_ppe_file_item IN temp_ppe_file_object
+      WRITEFILE temp_supplier_file_object, initial_item_details
+      WRITEFILE "\n"
+    ENDFOR
+  ENDIF
+  CLOSE initial_ppe_file_object
+  CLOSE temp_ppe_file_object
+  PRINT "Stock Updated Successfully"
+ENDFUNCTION
+
+
+FUNCTION check_item_stock_is_enough(supplier_code, item_code, quantity_needed)
+  ppe_file_object = OPENFILE "ppe.txt" FOR READ
+  FOREACH ppe_details IN ppe_file_object
+    ppe_details = ppe_details.rstrip()
+    ppe_details = ppe_details.split(",")
+    IF ppe_details[3] == supplier_code AND ppe_details[0] == item_code
+      IF ippe_details[2] < quantity_needed
+        RETURN False, ppe_details[2]
+      ELSE
+        RETURN True, ppe_details[2]
+    ENDIF
+  ENDFOR
+  RETURN False, 0
 ENDFUNCTION
