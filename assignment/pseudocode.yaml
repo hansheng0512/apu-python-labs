@@ -172,4 +172,20 @@ ENDFUNCTION
 FUNCTION retrieve_item_history()
   supplier_code = CALL get_input_supplier_code()
   item_code = CALL get_input_item_code(True)
+  distribution_file_object = OPENFILE "distribution.txt" FOR READ
+  DECLARE List supplier_code_list
+  DECLARE List target_hospital_list
+  DECLARE List item_code_list
+  DECLARE List quantity_list
+  FOREACH distribution_details IN distribution_file_object
+    distribution_details = distribution_details.rstrip()
+    distribution_details = distribution_details.split(",")
+    IF distribution_details[0] == supplier_code AND distribution_details[2] == item_code
+      APPEND distribution_details[0] TO supplier_code_list
+      APPEND distribution_details[1] TO target_hospital_list
+      APPEND distribution_details[2] TO item_code_list
+      APPEND int(distribution_details[3]) TO quantity_list
+    ENDIF
+  ENDFOR
+  CALL sort_and_filter_item_search(supplier_code_list, target_hospital_list, quantity_list, item_code_list)
 ENDFUNCTION
