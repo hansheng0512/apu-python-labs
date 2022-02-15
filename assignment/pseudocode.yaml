@@ -132,3 +132,6 @@ FUNCTION sort_and_filter_item_search(supplier_code_list, target_hospital_list, q
     index = index + 1
   ENDFOR
 ENDFUNCTION
+
+
+FUNCTION retrieve_item_history
