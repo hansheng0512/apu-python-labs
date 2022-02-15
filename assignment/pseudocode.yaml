@@ -331,3 +331,40 @@ FUNCTION distribution_module()
     ENDFO
   ENDDO
 ENDFUNCTION
+
+
+FUNCTION retrieve_all_based_on_supplier(supplier_code, less_than_threshold = False)
+  ppe_file_object = OPENFILE "ppe.txt" FOR READ
+  DECLARE List item_to_show
+  FOREACH ppe_details IN ppe_file_object
+    ppe_details = ppe_details.rstrip()
+    ppe_details = ppe_details.split(",")
+    IF ppe_details[3] == supplier_code THEN
+      IF ppe_details[2]) < 25 THEN
+        APPEND ppe_details TO item_to_show
+      ENDIF
+    ELSE
+      APPEND ppe_details TO item_to_show
+    ENDIF
+  ENDFOR
+  RETURN item_to_show
+ENDFUNCTION
+
+
+FUNCTION display_item(items_list)
+  PRINT "Supplier Code", "Item Code", "Quantity"
+  FOREACH item IN items_list
+    PRINT item[0], item[1], item[2]
+  ENDFOR
+ENDFUNCTION
+
+
+FUNCTION view_stock_less_than_twenty_five()
+  supplier_code = CALL get_input_supplier_code()
+  items_list = CALL retrieve_all_based_on_supplier(supplier_code, True)
+  IF LENGTH OF items_list > 0 THEN
+    display_item(items_list)
+  ELSE
+    PRINT "No Data"
+  ENDIF
+ENDFUNCTION

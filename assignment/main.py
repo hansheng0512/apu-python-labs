@@ -355,33 +355,6 @@ def distribution_module():
                 print("Invalid Input, only accept 0 and 1")
 
 
-def view_stock_less_than_twenty_five():
-    """
-    This function will view the stock less than 25 based on supplier code
-    """
-    supplier_code = get_input_supplier_code()
-    items_list = retrieve_all_based_on_supplier(supplier_code, True)
-    if len(items_list) > 0:
-        display_item(items_list)
-    else:
-        print("No Data")
-
-
-def display_item(items_list):
-    """
-    This function will display the item list
-    :param items_list: nested item list
-    """
-    print()
-    print("-" * 50)
-    print("View Stocks")
-    print("-" * 50)
-    print("{:<15} {:<15} {:<15}".format("Supplier Code", "Item Code", "Quantity"))
-    for item in items_list:
-        print("{:<15} {:<15} {:<15}".format(item[0], item[1], item[2]))
-    print()
-
-
 def retrieve_all_based_on_supplier(supplier_code, less_than_threshold = False):
     """
     This function will retrieve all the item based on supplier code
@@ -401,6 +374,33 @@ def retrieve_all_based_on_supplier(supplier_code, less_than_threshold = False):
             else:
                 item_to_show.append(ppe_details)
     return item_to_show
+
+
+def display_item(items_list):
+    """
+    This function will display the item list
+    :param items_list: nested item list
+    """
+    print()
+    print("-" * 50)
+    print("View Stocks")
+    print("-" * 50)
+    print("{:<15} {:<15} {:<15}".format("Supplier Code", "Item Code", "Quantity"))
+    for item in items_list:
+        print("{:<15} {:<15} {:<15}".format(item[0], item[1], item[2]))
+    print()
+
+
+def view_stock_less_than_twenty_five():
+    """
+    This function will view the stock less than 25 based on supplier code
+    """
+    supplier_code = get_input_supplier_code()
+    items_list = retrieve_all_based_on_supplier(supplier_code, True)
+    if len(items_list) > 0:
+        display_item(items_list)
+    else:
+        print("No Data")
 
 
 def view_all_stock():
