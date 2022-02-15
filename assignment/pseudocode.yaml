@@ -248,3 +248,86 @@ FUNCTION check_item_stock_is_enough(supplier_code, item_code, quantity_needed)
   ENDFOR
   RETURN False, 0
 ENDFUNCTION
+
+
+FUNCTION get_input_hospital_code(check_is_exist=False)
+  PRINT "Enter hospital code"
+  READ hospital_code
+  DOWHILE True
+    IF hospital_code == "" THEN
+      PRINT "Hospital code cannot be empty"
+      PRINT "Enter hospital code"
+      READ hospital_code
+    ELSE
+      IF check_is_exist == True THEN
+        is_valid_hospital = CALL check_is_code_exist(hospital_code, "HOSPITAL")
+        IF is_valid_hospital THEN
+          RETURN hospital_code
+        ELSE
+          PRINT "Hospital not found"
+          PRINT "Enter hospital code"
+          READ hospital_code
+        ENDIF
+      ELSE
+        RETURN hospital_code
+      ENDIF
+    ENDIF
+  ENDWHILE
+ENDFUNCTION
+
+
+FUNCTION get_string_input(title)
+  PRINT "Enter" + title
+  READ string_input
+  DOWHILE True
+    IF string_input = "" THEN
+      PRINT title + "cannot be empty"
+      PRINT "Enter" + title
+      READ string_input
+    ELSE
+      RETURN string_input
+    ENDIF
+  ENDWHILE
+ENDFUNCTION
+
+
+FUNCTION distribution_process()
+  distribution_file_object = OPENFILE "distribution.txt" FOR APPEND
+  supplier_code = CALL get_input_supplier_code(True)
+  target_hospital_code = CALL get_input_hospital_code(True)
+  item_code = get_input_item_code(True)
+  quantity_to_distribute = get_number_input("Quantity to Distribute")
+  is_stock_enough, balance = CALL check_item_stock_is_enough(supplier_code, item_code, quantity_to_distribute)
+  IF is_stock_enough THEN
+    CALL update_stock(supplier_code, item_code, quantity_to_distribute, "MINUS")
+    WRITEFILE distribution_file_object, supplier_code, target_hospital_code, item_code, quantity_to_distribute
+    WRITEFILE "\n"
+  ELSE
+    PRINT "Invalid stock, remaining", balance, "only"
+  ENDIF
+  CLOSE distribution_file_object
+ENDFUNCTION
+
+
+FUNCTION distribution_module()
+  distribute_item = True
+  DOWHILE distribute_item
+    CALL distribution_process()
+    continue_ask_confirm = True
+    DOWHILE continue_ask_confirm
+      PRINT "Want to distribute next item? [0-no 1-yes]"
+      IF break_process == "0" OR break_process == "1" THEN
+        IF THEN
+          continue_ask_confirm = False
+          distribute_item = False
+        ELSE
+          continue_ask_confirm = False
+          distribute_item = True
+        ENDIF
+      ELSE
+        continue_ask_confirm = True
+        PRINT "Invalid Input, only accept 0 and 1"
+      ENDIF
+    ENDFO
+  ENDDO
+ENDFUNCTION

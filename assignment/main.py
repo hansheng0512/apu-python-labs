@@ -264,6 +264,49 @@ def check_item_stock_is_enough(supplier_code, item_code, quantity_needed):
     return False, 0
 
 
+def get_input_hospital_code(check_is_exist = False):
+    """
+    Function to ask valid hospital code input
+    :param check_is_exist: boolean, check if hospital code exist
+    :return: return hospital code
+    """
+    hospital_code = input("Enter Hospital Code: ")
+    while True:
+        if hospital_code == "":
+            print("Hospital Code cannot be empty")
+            hospital_code = input("Enter Hospital Code: ")
+        else:
+            if check_is_exist:
+                is_valid_hospital = check_is_code_exist(hospital_code, "HOSPITAL")
+                if is_valid_hospital:
+                    return hospital_code
+                else:
+                    print("Hospital not found")
+                    hospital_code = input("Enter Hospital Code: ")
+            else:
+                return hospital_code
+
+
+def get_number_input(title):
+    """
+    Function to ask valid number input
+    :param title: title
+    :return: valid input from user
+    """
+    number_input = input("Enter {}: ".format(title))
+    while True:
+        if number_input == "":
+            print("{} cannot be empty".format(title))
+            number_input = input("Enter {}: ".format(title))
+        else:
+            try:
+                number_input = int(number_input)
+                return number_input
+            except:
+                print("{} must be a number".format(title))
+                number_input = input("Enter {}: ".format(title))
+
+
 def distribution_process():
     """
     This function will process the distribution record and update the stock
@@ -285,7 +328,7 @@ def distribution_process():
             "{},{},{},{}".format(supplier_code, target_hospital_code, item_code, quantity_to_distribute))
         distribution_file_object.write("\n")
     else:
-        print("Invalid Stock, remaining {} only".format(balance))
+        print("Invalid stock, remaining {} only".format(balance))
 
     distribution_file_object.close()
 
@@ -418,49 +461,6 @@ def inventory_creation(flexible_quantity = False):
             else:
                 continue_ask_confirm = True
                 print("Invalid Input, only accept 0 and 1")
-
-
-def get_input_hospital_code(check_is_exist = False):
-    """
-    Function to ask valid hospital code input
-    :param check_is_exist: boolean, check if hospital code exist
-    :return: return hospital code
-    """
-    hospital_code = input("Enter Hospital Code: ")
-    while True:
-        if hospital_code == "":
-            print("Hospital Code cannot be empty")
-            hospital_code = input("Enter Hospital Code: ")
-        else:
-            if check_is_exist:
-                is_valid_hospital = check_is_code_exist(hospital_code, "HOSPITAL")
-                if is_valid_hospital:
-                    return hospital_code
-                else:
-                    print("Hospital not found")
-                    hospital_code = input("Enter Hospital Code: ")
-            else:
-                return hospital_code
-
-
-def get_number_input(title):
-    """
-    Function to ask valid number input
-    :param title: title
-    :return: valid input from user
-    """
-    number_input = input("Enter {}: ".format(title))
-    while True:
-        if number_input == "":
-            print("{} cannot be empty".format(title))
-            number_input = input("Enter {}: ".format(title))
-        else:
-            try:
-                number_input = int(number_input)
-                return number_input
-            except:
-                print("{} must be a number".format(title))
-                number_input = input("Enter {}: ".format(title))
 
 
 def add_supplier(current_supplier):
