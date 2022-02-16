@@ -216,22 +216,23 @@ FUNCTION update_stock(supplier_code, item_code, new_quantity, action)
       WRITEFILE temp_supplier_file_object, initial_item_details
       WRITEFILE "\n"
     ENDFOR
-  ENDIF
-  IF action == "ADD"
-    FOREACH initial_item_details IN initial_ppe_file_object
-      initial_item_details = initial_item_details.rstrip()
-      initial_item_details = initial_item_details.split(",")
-      IF initial_item_details[3] == supplier_code AND initial_item_details[0] == item_code
-        APPEND initial_item_details[0], initial_item_details[1], str(int(initial_item_details[2]) + new_quantity), supplier_code TO initial_ppe_file_object_list
-      ELSE
-        APPEND initial_item_details[0], initial_item_details[1], initial_item_details[2], supplier_code TO initial_ppe_file_object_list
-      ENDIF
-    ENDFOR
-    temp_ppe_file_object = OPENFILE "ppe.txt" FOR WRITE
-    FOREACH initial_ppe_file_item IN temp_ppe_file_object
-      WRITEFILE temp_supplier_file_object, initial_item_details
-      WRITEFILE "\n"
-    ENDFOR
+  ELSE
+    IF action == "ADD"
+      FOREACH initial_item_details IN initial_ppe_file_object
+        initial_item_details = initial_item_details.rstrip()
+        initial_item_details = initial_item_details.split(",")
+        IF initial_item_details[3] == supplier_code AND initial_item_details[0] == item_code
+          APPEND initial_item_details[0], initial_item_details[1], str(int(initial_item_details[2]) + new_quantity), supplier_code TO initial_ppe_file_object_list
+        ELSE
+          APPEND initial_item_details[0], initial_item_details[1], initial_item_details[2], supplier_code TO initial_ppe_file_object_list
+        ENDIF
+      ENDFOR
+      temp_ppe_file_object = OPENFILE "ppe.txt" FOR WRITE
+      FOREACH initial_ppe_file_item IN temp_ppe_file_object
+        WRITEFILE temp_supplier_file_object, initial_item_details
+        WRITEFILE "\n"
+      ENDFOR
+    ENDIF
   ENDIF
   CLOSE initial_ppe_file_object
   CLOSE temp_ppe_file_object
@@ -409,15 +410,12 @@ FUNCTION add_item(flexible_quantity)
   supplier_code = CALL get_input_supplier_code(True)
   IF flexible_quantity THEN
     item_code = get_input_item_code(True, False)
+    item_quantity = CALL get_number_input("Item Quantity")
+    PRINT "Added", item_code, "with extra quantity", item_quantity, "to supplier", supplier_code
+    update_stock(supplier_code, item_code, item_quantity, "ADD")
   ELSE
     item_name = get_string_input("Item Name")
     item_code = get_input_item_code(True, True)
-  ENDIF
-  IF flexible_quantity THEN
-    item_quantity = CALL get_number_input("Item Quantity")
-    PRINT "Added", item_code, "with extra quantity", item_quantity, "to supplier", supplier_code  
-    update_stock(supplier_code, item_code, item_quantity, "ADD")
-  ELSE
     item_quantity = 100
     PRINT "Added", item_code, "with quantity", item_quantity, "to supplier", supplier_code 
     ppe_file_object = OPENFILE "ppe.txt" FOR APPEND
@@ -453,7 +451,7 @@ ENDFUNCTION
 
 
 FUNCTION add_supplier(current_supplier)
-  PRINT "Insert Supplier", current_supplier,"Details"
+  PRINT "Insert supplier", current_supplier,"details"
   supplier_file_object = OPENFILE "suppliers.txt" FOR APPEND
   supplier_code = CALL get_input_supplier_code()
   supplier_name = CALL get_string_input("Supplier Name")
@@ -461,7 +459,7 @@ FUNCTION add_supplier(current_supplier)
   WRITEFILE supplier_file_object, supplier_code, supplier_name, supplier_address
   WRITEFILE supplier_file_object "\n"
   CLOSE supplier_file_object
-  PRINT "Supplier", current_supplier,"Added Successfully\n"
+  PRINT "Supplier", current_supplier,"added successfully\n"
 ENDFUNCTION
 
 
@@ -492,26 +490,27 @@ FUNCTION supplier_registration()
         ENDIF
       ENDDO
     ENDIF
+    current_supplier = current_supplier + 1
   ENDDO
 ENDFUNCTION
 
 
 FUNCTION add_hospital(current_hospital)
-  PRINT "Insert Hospital", current_hospital,"Details"
+  PRINT "Insert hospital", current_hospital,"details"
   hospital_file_object = OPENFILE "hospitals.txt" FOR APPEND
   hospital_code = CALL get_input_supplier_code()
-  hospital_name = CALL get_string_input("Hospital Name")
-  hospital_address = CALL get_string_input("Hospital Address")
+  hospital_name = CALL get_string_input("Hospital name")
+  hospital_address = CALL get_string_input("Hospital address")
   WRITEFILE hospital_file_object, hospital_code, hospital_name, hospital_address
   WRITEFILE hospital_file_object "\n"
   CLOSE hospital_file_object
-  PRINT "Hospital", current_hospital,"Added Successfully\n"
+  PRINT "Hospital", current_hospital,"added successfully\n"
 ENDFUNCTION
 
 
 FUNCTION hospital_registration()
-  PRINT "Supplier Registration"
-  PRINT "All previous supplier details will be overwritten"
+  PRINT "Hospital registration"
+  PRINT "All previous hospital details will be overwritten"
   min_hospital = 3
   max_hospital = 4
   current_hospital = 1
@@ -536,6 +535,7 @@ FUNCTION hospital_registration()
         ENDIF
       ENDDO
     ENDIF
+    current_hospital = current_hospital + 1
   ENDDO
 ENDFUNCTION
 
@@ -547,50 +547,60 @@ FUNCTION main_menu()
     PRINT "2. Hospital Registration"
     PRINT "3. Add New Item for Supplier"
     PRINT "4. View All Stock"
-    PRINT "5. View Stock which Less Than 25"
+    PRINT "5. View Stock which less than 25"
     PRINT "6. Distribute Item to Hospital"
     PRINT "7. Search Item based on Item Code"
     PRINT "8. Supplier Profile Update"
     PRINT "9. Update Supplier Existing Stock"
     PRINT "10. Exit"
     DOWHILE True
-      PRINT "Enter Option"
-      READ option
-      IF 1 <= option <= 10 THEN
+      TRY
+        PRINT "Enter Option"
+          READ option
+        IF 1 <= option <= 10 THEN
         IF option == 1 THEN
           supplier_registration()
-        ENDIF
-        IF option == 2 THEN
-          hospital_registration()
-        ENDIF
-        IF option == 3 THEN
-          inventory_creation()
-        ENDIF
-        IF option == 4 THEN
-          view_all_stock()
-        ENDIF
-        IF option == 5 THEN
-          view_stock_less_than_twenty_five()
-        ENDIF
-        IF option == 6 THEN
-          view_stock_less_than_twenty_five()
-        ENDIF
-        IF option == 7 THEN
-          retrieve_item_history()
-        ENDIF
-        IF option == 8 THEN
-          update_supplier_details()
-        ENDIF
-        IF option == 9 THEN
-          inventory_creation()
-        ENDIF
-        IF option == 10 THEN
-          PRINT "Bye"
-          BREAK
-        ENDIF
-      ELSE
-        PRINT "Invalid Option"
-      ENDIF
+        ELSE
+          IF option == 2 THEN
+            hospital_registration()
+          ELSE
+            IF option == 3 THEN
+              inventory_creation()
+            ELSE
+              IF option == 4 THEN
+                view_all_stock()
+              ELSE
+                IF option == 5 THEN
+                  view_stock_less_than_twenty_five()
+                ELSE
+                  IF option == 6 THEN
+                    view_stock_less_than_twenty_five()
+                  ELSE
+                    IF option == 7 THEN
+                      retrieve_item_history()
+                    ELSE
+                      IF option == 8 THEN
+                        update_supplier_details()
+                      ELSE
+                        IF option == 9 THEN
+                          inventory_creation()
+                        ELSE
+                          IF option == 10 THEN
+                            PRINT "Bye"
+                            BREAK
+                          ELSE
+                            PRINT "Invalid Option"
+                          ENDIF
+                        ENDIF
+                      ENDIF
+                    ENDIF
+                  ENDIF
+                ENDIF
+              ENDIF
+            ENDIF
+          ENDIF
+      EXCEPT
+        PRINT "Option must be a number"
     ENDDO
   ENDDO
 ENDFUNCTION

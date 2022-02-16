@@ -427,14 +427,12 @@ def add_item(flexible_quantity):
     supplier_code = get_input_supplier_code(True)
     if flexible_quantity:
         item_code = get_input_item_code(True, False)
-    else:
-        item_name = get_string_input("Item Name")
-        item_code = get_input_item_code(True, True)
-    if flexible_quantity:
         item_quantity = get_number_input("Item Quantity")
         print('Added {} with extra quantity {} to supplier {}'.format(item_code, item_quantity, supplier_code))
         update_stock(supplier_code, item_code, item_quantity, "ADD")
     else:
+        item_name = get_string_input("Item Name")
+        item_code = get_input_item_code(True, True)
         item_quantity = 100
         print('Added {} with quantity {} to supplier {}'.format(item_code, 100, supplier_code))
         ppe_file_object = open("ppe.txt", "a")
@@ -471,22 +469,22 @@ def add_supplier(current_supplier):
     Function to add supplier
     :param current_supplier: current supplier
     """
-    print("Insert Supplier {} Details".format(current_supplier))
+    print("Insert supplier {} details".format(current_supplier))
     supplier_file_object = open("suppliers.txt", "a")
     supplier_code = get_input_supplier_code()
-    supplier_name = get_string_input("Supplier Name")
-    supplier_address = get_string_input("Supplier Address")
+    supplier_name = get_string_input("Supplier name")
+    supplier_address = get_string_input("Supplier address")
     supplier_file_object.write("{},{},{}".format(supplier_code, supplier_name, supplier_address))
     supplier_file_object.write("\n")
     supplier_file_object.close()
-    print("Supplier {} Added Successfully\n".format(current_supplier))
+    print("Supplier {} added successfully\n".format(current_supplier))
 
 
 def supplier_registration():
     """
     Function to register supplier
     """
-    print("Supplier Registration")
+    print("Supplier registration")
     print("All previous supplier details will be overwritten")
     min_supplier = 3
     max_supplier = 4
@@ -519,22 +517,22 @@ def add_hospital(current_hospital):
     Function to add hospital
     :param current_hospital: current hospital
     """
-    print("Insert Hospital {} Details".format(current_hospital))
+    print("Insert hospital {} details".format(current_hospital))
     hospital_file_object = open("hospitals.txt", "a")
     hospital_code = get_input_hospital_code()
-    hospital_name = get_string_input("Hospital Name")
-    hospital_address = get_string_input("Hospital Address")
+    hospital_name = get_string_input("Hospital name")
+    hospital_address = get_string_input("Hospital address")
     hospital_file_object.write("{},{},{}".format(hospital_code, hospital_name, hospital_address))
     hospital_file_object.write("\n")
     hospital_file_object.close()
-    print("Hospital {} Added Successfully\n".format(current_hospital))
+    print("Hospital {} added successfully\n".format(current_hospital))
 
 
 def hospital_registration():
     """
     Function to register hospital
     """
-    print("Hospital Registration")
+    print("Hospital registration")
     print("All previous hospital details will be overwritten")
     min_hospital = 3
     max_hospital = 4
@@ -565,7 +563,6 @@ def hospital_registration():
 def main_menu():
     """
     Function to display main menu
-    Function to display main menu
     """
     while True:
         print("-" * 50)
@@ -575,7 +572,7 @@ def main_menu():
         print("2. Hospital Registration")
         print("3. Add New Item for Supplier")
         print("4. View All Stock")
-        print("5. View Stock which Less Than 25")
+        print("5. View Stock which less than 25")
         print("6. Distribute Item to Hospital")
         print("7. Search Item based on Item Code")
         print("8. Supplier Profile Update")
