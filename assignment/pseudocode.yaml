@@ -283,7 +283,7 @@ ENDFUNCTION
 
 FUNCTION get_number_input(title)
   PRINT "Enter", title
-  READ title
+  READ number_input
   DOWHILE True
     IF number_input == "" THEN
       PRINT title, "cannot be empty"
@@ -305,7 +305,7 @@ FUNCTION distribution_process()
   supplier_code = CALL get_input_supplier_code(True)
   target_hospital_code = CALL get_input_hospital_code(True)
   item_code = get_input_item_code(True)
-  quantity_to_distribute = get_number_input("Quantity to Distribute")
+  quantity_to_distribute = get_number_input("Quantity to distribute")
   is_stock_enough, balance = CALL check_item_stock_is_enough(supplier_code, item_code, quantity_to_distribute)
   IF is_stock_enough THEN
     CALL update_stock(supplier_code, item_code, quantity_to_distribute, "MINUS")
@@ -326,7 +326,7 @@ FUNCTION distribution_module()
     DOWHILE continue_ask_confirm
       PRINT "Want to distribute next item? [0-no 1-yes]"
       IF break_process == "0" OR break_process == "1" THEN
-        IF THEN
+        IF break_process == "0" THEN
           continue_ask_confirm = False
           distribute_item = False
         ELSE

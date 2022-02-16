@@ -310,7 +310,7 @@ def distribution_process():
 
     item_code = get_input_item_code(True)
 
-    quantity_to_distribute = get_number_input("Quantity to Distribute")
+    quantity_to_distribute = get_number_input("Quantity to distribute")
 
     is_stock_enough, balance = check_item_stock_is_enough(supplier_code, item_code, quantity_to_distribute)
 
