@@ -3,22 +3,27 @@ FUNCTION check_is_code_exist(target_code, target)
   DECLARE String Line
   DECLARE File file_object
   IF target == "SUPPLIER" THEN
-    Filename = "supplier.txt" 
-  ENDIF
-  IF target == "HOSPITAL" THEN
-    Filename = "hospital.txt"
-  ENDIF
-  IF target == "ITEM" THEN
-    Filename = "ppe.txt"
+    Filename = "suppliers.txt" 
+  ELSE
+    IF target == "HOSPITAL" THEN
+      Filename = "hospitals.txt"
+    ELSE
+      IF target == "ITEM" THEN
+        Filename = "ppe.txt"
+      ELSE
+        PRINT "Invalid target"
+        RETURN False
+      ENDIF
+    ENDIF
   ENDIF
   file_object = OPENFILE Filename FOR READ
   FOREACH details IN file_object
-    READ details
     details = details.split(",")
     IF details[0] = target_code THEN
+      CLOSE file_object
       RETURN True
   ENDFOR
-  CLOSE Filename
+  CLOSE file_object
   RETURN False
 END
 
@@ -28,7 +33,7 @@ FUNCTION get_input_supplier_code(check_is_exist=False)
   READ supplier_code
   DOWHILE True
     IF supplier_code == "" THEN
-      PRINT "Supplier Code cannot be empty"
+      PRINT "Supplier code cannot be empty"
       PRINT "Enter supplier code"
       READ supplier_code
     ELSE
@@ -50,11 +55,11 @@ ENDFUNCTION
 
 
 FUNCTION get_string_input(title)
-  PRINT "Enter" + title
+  PRINT "Enter", title
   READ string_input
   DOWHILE True
     IF string_input = "" THEN
-      PRINT title + "cannot be empty"
+      PRINT title, "cannot be empty"
       PRINT "Enter" + title
       READ string_input
     ELSE
@@ -70,7 +75,7 @@ FUNCTION update_supplier_details()
   supplier_code = CALL get_input_supplier_code()
   supplier_new_name = CALL get_string_input("New Supplier Name")
   supplier_new_address = CALL get_string_input("New Supplier Address")
-  initial_supplier_file_object = OPENFILE "supplier.txt" FOR READ
+  initial_supplier_file_object = OPENFILE "suppliers.txt" FOR READ
   DECLARE List initial_supplier_file_object_list
   FOREACH initial_supplier_details IN initial_supplier_file_object
     initial_supplier_details = initial_supplier_details.rstrip()
@@ -83,12 +88,12 @@ FUNCTION update_supplier_details()
       supplier_name_to_save = initial_supplier_details[1]
       supplier_address_to_save = initial_supplier_details[2]
     ENDIF
-    APPEND [supplier_code_to_save, supplier_name_to_save, supplier_address_to_save] TO initial_supplier_file_object_list
+    APPEND supplier_code_to_save, supplier_name_to_save, supplier_address_to_save TO initial_supplier_file_object_list
   ENDFOR
-  temp_supplier_file_object = OPENFILE "supplier.txt" FOR WRITE
+  temp_supplier_file_object = OPENFILE "suppliers.txt" FOR WRITE
   FOREACH initial_supplier_file_item IN initial_supplier_file_object_list
     WRITEFILE temp_supplier_file_object, supplier_code_to_save, supplier_name_to_save, supplier_address_to_save
-    WRITEFILE "\n"
+    WRITEFILE temp_supplier_file_object, "\n"
   ENDFOR
   CLOSE initial_supplier_file_object
   CLOSE temp_supplier_file_object
@@ -206,7 +211,7 @@ FUNCTION update_stock(supplier_code, item_code, new_quantity, action)
       WRITEFILE temp_supplier_file_object, initial_item_details[0], initial_item_details[1], final_quantity, supplier_code
       WRITEFILE "\n"
     ENDFOR
-    temp_ppe_file_object = OPENFILE "supplier.txt" FOR WRITE
+    temp_ppe_file_object = OPENFILE "suppliers.txt" FOR WRITE
     FOREACH initial_item_details IN initial_ppe_file_object
       WRITEFILE temp_supplier_file_object, initial_item_details
       WRITEFILE "\n"
@@ -352,6 +357,21 @@ FUNCTION distribution_module()
 ENDFUNCTION
 
 
+FUNCTION sort_item_list(item_list)
+  init_list = LENGTH OF item_list
+  LOOP i FROM 0 TO init_list STEP 1
+    LOOP j FROM 0 TO init_list - i - 1 STEP 1
+      IF item_list[j][0] > item_list[j + 1][0] THEN
+        tempo = item_list[j]
+        item_list[j] = item_list[j + 1]
+        item_list[j + 1] = tempo
+      ENDIF
+    ENDLOOP
+  ENDLOOP
+  RETURN item_list
+ENDFUNCTION
+
+
 FUNCTION retrieve_all_based_on_supplier(supplier_code, less_than_threshold = False)
   ppe_file_object = OPENFILE "ppe.txt" FOR READ
   DECLARE List item_to_show
@@ -449,7 +469,7 @@ ENDFUNCTION
 
 FUNCTION add_supplier(current_supplier)
   PRINT "Insert Supplier", current_supplier,"Details"
-  supplier_file_object = OPENFILE "supplier.txt" FOR APPEND
+  supplier_file_object = OPENFILE "suppliers.txt" FOR APPEND
   supplier_code = CALL get_input_supplier_code()
   supplier_name = CALL get_string_input("Supplier Name")
   supplier_address = CALL get_string_input("Supplier Address")
@@ -466,7 +486,7 @@ FUNCTION supplier_registration()
   min_supplier = 3
   max_supplier = 4
   current_supplier = 1
-  file_object = OPENFILE "supplier.txt" FOR WRITE
+  file_object = OPENFILE "suppliers.txt" FOR WRITE
   file_object.close()
   DOWHILE current_supplier <= max_supplier
     CALL add_supplier(current_supplier)
@@ -493,7 +513,7 @@ ENDFUNCTION
 
 FUNCTION add_hospital(current_hospital)
   PRINT "Insert Hospital", current_hospital,"Details"
-  hospital_file_object = OPENFILE "hospital.txt" FOR APPEND
+  hospital_file_object = OPENFILE "hospitals.txt" FOR APPEND
   hospital_code = CALL get_input_supplier_code()
   hospital_name = CALL get_string_input("Hospital Name")
   hospital_address = CALL get_string_input("Hospital Address")
@@ -510,7 +530,7 @@ FUNCTION hospital_registration()
   min_hospital = 3
   max_hospital = 4
   current_hospital = 1
-  file_object = OPENFILE "hospital.txt" FOR WRITE
+  file_object = OPENFILE "hospitals.txt" FOR WRITE
   file_object.close()
   DOWHILE current_hospital <= max_hospital
     CALL add_hospital(current_hospital)

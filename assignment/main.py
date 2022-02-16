@@ -6,15 +6,19 @@ def check_is_code_exist(target_code, target):
     :return: return True if exist, False if not
     """
     if target == "SUPPLIER":
-        file_object = open("supplier.txt", "r")
+        file_object = open("suppliers.txt", "r")
     elif target == "HOSPITAL":
-        file_object = open("hospital.txt", "r")
+        file_object = open("hospitals.txt", "r")
     elif target == "ITEM":
         file_object = open("ppe.txt", "r")
+    else:
+        print("Invalid target")
+        return False
     for details in file_object:
         details = details.rstrip()
         details = details.split(",")
         if details[0] == target_code:
+            file_object.close()
             return True
     file_object.close()
     return False
@@ -29,8 +33,8 @@ def get_input_supplier_code(check_is_exist = False):
     supplier_code = input("Enter Supplier Code: ")
     while True:
         if supplier_code == "":
-            print("Supplier Code cannot be empty")
-            supplier_code = input("Enter Supplier Code: ")
+            print("Supplier code cannot be empty")
+            supplier_code = input("Enter supplier code: ")
         else:
             if check_is_exist:
                 is_valid_supplier = check_is_code_exist(supplier_code, "SUPPLIER")
@@ -66,7 +70,7 @@ def update_supplier_details():
     supplier_new_name = get_string_input("New Supplier Name")
     supplier_new_address = get_string_input("New Supplier Address")
 
-    initial_supplier_file_object = open("supplier.txt", "r")
+    initial_supplier_file_object = open("suppliers.txt", "r")
     initial_supplier_file_object_list = []
 
     for initial_supplier_details in initial_supplier_file_object:
@@ -81,7 +85,7 @@ def update_supplier_details():
             supplier_address_to_save = initial_supplier_details[2]
         initial_supplier_file_object_list.append("{},{},{}".format(supplier_code_to_save, supplier_name_to_save, supplier_address_to_save))
 
-    temp_supplier_file_object = open("supplier.txt", "w")
+    temp_supplier_file_object = open("suppliers.txt", "w")
     for initial_supplier_file_item in initial_supplier_file_object_list:
         temp_supplier_file_object.write(initial_supplier_file_item + "\n")
     temp_supplier_file_object.write(
@@ -143,7 +147,7 @@ def get_input_item_code(check_is_exist = False, add_item = False):
     :param check_is_exist: boolean, check if item code exist
     :return: return item code
     """
-    item_code = input("Enter item Code: ")
+    item_code = input("Enter item code: ")
     while True:
         if item_code == "":
             print("Item code cannot be empty")
@@ -227,18 +231,6 @@ def update_stock(supplier_code, item_code, new_quantity, action):
         temp_ppe_file_object = open("ppe.txt", "w")
         for initial_ppe_file_item in initial_ppe_file_object_list:
             temp_ppe_file_object.write(initial_ppe_file_item + "\n")
-    # else:
-    #     for initial_item_details in initial_ppe_file_object:
-    #         initial_item_details = initial_item_details.rstrip()
-    #         initial_item_details = initial_item_details.split(",")
-    #         initial_ppe_file_object_list.append("{},{},{},{}".format(initial_item_details[0], initial_item_details[1], initial_item_details[2]), supplier_code)
-    #     temp_ppe_file_object = open("ppe.txt", "w")
-    #     for initial_ppe_file_item in initial_ppe_file_object_list:
-    #         temp_ppe_file_object.write(initial_ppe_file_item + "\n")
-    #     temp_ppe_file_object.write(
-    #         "{},{},{},{}".format(supplier_code, item_code, new_quantity, supplier_code))
-    #     temp_ppe_file_object.write("\n")
-
     initial_ppe_file_object.close()
     temp_ppe_file_object.close()
     print("Stock Updated Successfully")
@@ -355,6 +347,17 @@ def distribution_module():
                 print("Invalid Input, only accept 0 and 1")
 
 
+def sort_item_list(item_list):
+    init_list = len(item_list)
+    for i in range(0, init_list):
+        for j in range(0, init_list - i - 1):
+            if (item_list[j][0] > item_list[j + 1][0]):
+                tempo = item_list[j]
+                item_list[j] = item_list[j + 1]
+                item_list[j + 1] = tempo
+    return item_list
+
+
 def retrieve_all_based_on_supplier(supplier_code, less_than_threshold = False):
     """
     This function will retrieve all the item based on supplier code
@@ -373,6 +376,7 @@ def retrieve_all_based_on_supplier(supplier_code, less_than_threshold = False):
                     item_to_show.append(ppe_details)
             else:
                 item_to_show.append(ppe_details)
+    item_to_show = sort_item_list(item_to_show)
     return item_to_show
 
 
@@ -468,7 +472,7 @@ def add_supplier(current_supplier):
     :param current_supplier: current supplier
     """
     print("Insert Supplier {} Details".format(current_supplier))
-    supplier_file_object = open("supplier.txt", "a")
+    supplier_file_object = open("suppliers.txt", "a")
     supplier_code = get_input_supplier_code()
     supplier_name = get_string_input("Supplier Name")
     supplier_address = get_string_input("Supplier Address")
@@ -489,7 +493,7 @@ def supplier_registration():
     current_supplier = 1
 
     # Clear Supplier File
-    file_object = open("supplier.txt", "w")
+    file_object = open("suppliers.txt", "w")
     file_object.close()
 
     while current_supplier <= max_supplier:
@@ -516,7 +520,7 @@ def add_hospital(current_hospital):
     :param current_hospital: current hospital
     """
     print("Insert Hospital {} Details".format(current_hospital))
-    hospital_file_object = open("hospital.txt", "a")
+    hospital_file_object = open("hospitals.txt", "a")
     hospital_code = get_input_hospital_code()
     hospital_name = get_string_input("Hospital Name")
     hospital_address = get_string_input("Hospital Address")
@@ -537,7 +541,7 @@ def hospital_registration():
     current_hospital = 1
 
     # Clear Hospital File
-    file_object = open("hospital.txt", "w")
+    file_object = open("hospitals.txt", "w")
     file_object.close()
 
     while current_hospital <= max_hospital:
@@ -560,6 +564,7 @@ def hospital_registration():
 
 def main_menu():
     """
+    Function to display main menu
     Function to display main menu
     """
     while True:
