@@ -233,7 +233,7 @@ def update_stock(supplier_code, item_code, new_quantity, action):
             temp_ppe_file_object.write(initial_ppe_file_item + "\n")
     initial_ppe_file_object.close()
     temp_ppe_file_object.close()
-    print("Stock Updated Successfully")
+    print("Stock updated successfully")
 
 
 def check_item_stock_is_enough(supplier_code, item_code, quantity_needed):

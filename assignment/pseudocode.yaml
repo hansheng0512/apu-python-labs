@@ -235,7 +235,7 @@ FUNCTION update_stock(supplier_code, item_code, new_quantity, action)
   ENDIF
   CLOSE initial_ppe_file_object
   CLOSE temp_ppe_file_object
-  PRINT "Stock Updated Successfully"
+  PRINT "Stock updated successfully"
 ENDFUNCTION
 
 
