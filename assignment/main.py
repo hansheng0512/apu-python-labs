@@ -262,11 +262,11 @@ def get_input_hospital_code(check_is_exist = False):
     :param check_is_exist: boolean, check if hospital code exist
     :return: return hospital code
     """
-    hospital_code = input("Enter Hospital Code: ")
+    hospital_code = input("Enter hospital code: ")
     while True:
         if hospital_code == "":
-            print("Hospital Code cannot be empty")
-            hospital_code = input("Enter Hospital Code: ")
+            print("Hospital code cannot be empty")
+            hospital_code = input("Enter hospital Code: ")
         else:
             if check_is_exist:
                 is_valid_hospital = check_is_code_exist(hospital_code, "HOSPITAL")

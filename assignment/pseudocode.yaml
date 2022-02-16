@@ -281,21 +281,6 @@ FUNCTION get_input_hospital_code(check_is_exist=False)
 ENDFUNCTION
 
 
-FUNCTION get_string_input(title)
-  PRINT "Enter" + title
-  READ string_input
-  DOWHILE True
-    IF string_input = "" THEN
-      PRINT title + "cannot be empty"
-      PRINT "Enter" + title
-      READ string_input
-    ELSE
-      RETURN string_input
-    ENDIF
-  ENDWHILE
-ENDFUNCTION
-
-
 FUNCTION get_number_input(title)
   PRINT "Enter", title
   READ title
