@@ -2,7 +2,7 @@ def check_is_code_exist(target_code, target):
     """
     Function to check if supplier/hospital/item code is valid
     :param target_code: supplier code/hospital code/item code
-    :param target: HOSPITAL/SUPPLIRER/ITEM
+    :param target: HOSPITAL/SUPPLIER/ITEM
     :return: return True if exist, False if not
     """
     if target == "SUPPLIER":
@@ -66,6 +66,7 @@ def update_supplier_details():
     """
     This function will update the supplier details
     """
+    view_all_supplier()
     supplier_code = get_input_supplier_code()
     supplier_new_name = get_string_input("New Supplier Name")
     supplier_new_address = get_string_input("New Supplier Address")
@@ -83,7 +84,8 @@ def update_supplier_details():
         else:
             supplier_name_to_save = initial_supplier_details[1]
             supplier_address_to_save = initial_supplier_details[2]
-        initial_supplier_file_object_list.append("{},{},{}".format(supplier_code_to_save, supplier_name_to_save, supplier_address_to_save))
+        initial_supplier_file_object_list.append("{},{},{}".format(supplier_code_to_save, supplier_name_to_save,
+                                                                   supplier_address_to_save))
 
     temp_supplier_file_object = open("suppliers.txt", "w")
     for initial_supplier_file_item in initial_supplier_file_object_list:
@@ -170,11 +172,11 @@ def get_input_item_code(check_is_exist = False, add_item = False):
             else:
                 return item_code
 
+
 def retrieve_item_history():
     """
     This function will retrieve the distributed item and display the history
     """
-    supplier_code = get_input_supplier_code()
     item_code = get_input_item_code(True)
     distribution_file_object = open("distribution.txt", "r")
     supplier_code_list = []
@@ -184,7 +186,7 @@ def retrieve_item_history():
     for distribution_details in distribution_file_object:
         distribution_details = distribution_details.rstrip()
         distribution_details = distribution_details.split(",")
-        if distribution_details[0] == supplier_code and distribution_details[2] == item_code:
+        if distribution_details[2] == item_code:
             supplier_code_list.append(distribution_details[0])
             target_hospital_list.append(distribution_details[1])
             item_code_list.append(distribution_details[2])
@@ -211,7 +213,8 @@ def update_stock(supplier_code, item_code, new_quantity, action):
                 final_quantity = str(int(initial_item_details[2]) - new_quantity)
             else:
                 final_quantity = initial_item_details[2]
-            initial_ppe_file_object_list.append("{},{},{},{}".format(initial_item_details[0], initial_item_details[1], final_quantity, supplier_code))
+            initial_ppe_file_object_list.append("{},{},{},{}".format(initial_item_details[0], initial_item_details[1],
+                                                                     final_quantity, supplier_code))
 
         temp_ppe_file_object = open("ppe.txt", "w")
         for initial_ppe_file_item in initial_ppe_file_object_list:
@@ -226,7 +229,8 @@ def update_stock(supplier_code, item_code, new_quantity, action):
                                       str(int(initial_item_details[2]) + new_quantity), supplier_code))
             else:
                 initial_ppe_file_object_list.append(
-                    "{},{},{},{}".format(initial_item_details[0], initial_item_details[1], initial_item_details[2], supplier_code))
+                    "{},{},{},{}".format(initial_item_details[0], initial_item_details[1], initial_item_details[2],
+                                         supplier_code))
 
         temp_ppe_file_object = open("ppe.txt", "w")
         for initial_ppe_file_item in initial_ppe_file_object_list:
@@ -304,16 +308,14 @@ def distribution_process():
     This function will process the distribution record and update the stock
     """
     distribution_file_object = open("distribution.txt", "a")
+    view_all_supplier()
     supplier_code = get_input_supplier_code(True)
-
+    view_all_hospital()
     target_hospital_code = get_input_hospital_code(True)
-
+    view_all_item_based_on_supplier_id(supplier_code)
     item_code = get_input_item_code(True)
-
     quantity_to_distribute = get_number_input("Quantity to distribute")
-
     is_stock_enough, balance = check_item_stock_is_enough(supplier_code, item_code, quantity_to_distribute)
-
     if is_stock_enough:
         update_stock(supplier_code, item_code, quantity_to_distribute, "MINUS")
         distribution_file_object.write(
@@ -321,7 +323,6 @@ def distribution_process():
         distribution_file_object.write("\n")
     else:
         print("Invalid stock, remaining {} only".format(balance))
-
     distribution_file_object.close()
 
 
@@ -348,10 +349,15 @@ def distribution_module():
 
 
 def sort_item_list(item_list):
+    """
+    This function will sort the item list by item code
+    :param item_list:
+    :return: sorted item_list
+    """
     init_list = len(item_list)
     for i in range(0, init_list):
         for j in range(0, init_list - i - 1):
-            if (item_list[j][0] > item_list[j + 1][0]):
+            if item_list[j][0] > item_list[j + 1][0]:
                 tempo = item_list[j]
                 item_list[j] = item_list[j + 1]
                 item_list[j + 1] = tempo
@@ -389,7 +395,7 @@ def display_item(items_list):
     print("-" * 50)
     print("View Stocks")
     print("-" * 50)
-    print("{:<15} {:<15} {:<15}".format("Supplier Code", "Item Code", "Quantity"))
+    print("{:<15} {:<15} {:<15}".format("Item Code", "Item Name", "Quantity"))
     for item in items_list:
         print("{:<15} {:<15} {:<15}".format(item[0], item[1], item[2]))
     print()
@@ -399,6 +405,7 @@ def view_stock_less_than_twenty_five():
     """
     This function will view the stock less than 25 based on supplier code
     """
+    view_all_supplier()
     supplier_code = get_input_supplier_code()
     items_list = retrieve_all_based_on_supplier(supplier_code, True)
     if len(items_list) > 0:
@@ -411,6 +418,7 @@ def view_all_stock():
     """
     This function will view all the stock
     """
+    view_all_supplier()
     supplier_code = get_input_supplier_code()
     items_list = retrieve_all_based_on_supplier(supplier_code)
     if len(items_list) > 0:
@@ -426,13 +434,14 @@ def add_item(flexible_quantity):
     """
     supplier_code = get_input_supplier_code(True)
     if flexible_quantity:
+        view_all_item_based_on_supplier_id(supplier_code)
         item_code = get_input_item_code(True, False)
         item_quantity = get_number_input("Item Quantity")
         print('Added {} with extra quantity {} to supplier {}'.format(item_code, item_quantity, supplier_code))
         update_stock(supplier_code, item_code, item_quantity, "ADD")
     else:
-        item_name = get_string_input("Item Name")
         item_code = get_input_item_code(True, True)
+        item_name = get_string_input("Item Name")
         item_quantity = 100
         print('Added {} with quantity {} to supplier {}'.format(item_code, 100, supplier_code))
         ppe_file_object = open("ppe.txt", "a")
@@ -446,8 +455,12 @@ def inventory_creation(flexible_quantity = False):
     This function will create the assign item to supplier
     :param flexible_quantity: if True, will update the quantity based on the input, else will update the quantity with 100
     """
+    if not flexible_quantity:
+        file_object = open("ppe.txt", "w")
+        file_object.close()
     continue_add_item = True
     while continue_add_item:
+        view_all_supplier()
         add_item(flexible_quantity)
         continue_ask_confirm = True
         while continue_ask_confirm:
@@ -470,8 +483,15 @@ def add_supplier(current_supplier):
     :param current_supplier: current supplier
     """
     print("Insert supplier {} details".format(current_supplier))
-    supplier_file_object = open("suppliers.txt", "a")
     supplier_code = get_input_supplier_code()
+    while True:
+        is_supplier_exist = check_is_code_exist(supplier_code, "SUPPLIER")
+        if is_supplier_exist:
+            print("Supplier code already exist")
+            supplier_code = get_input_supplier_code()
+        else:
+            break
+    supplier_file_object = open("suppliers.txt", "a")
     supplier_name = get_string_input("Supplier name")
     supplier_address = get_string_input("Supplier address")
     supplier_file_object.write("{},{},{}".format(supplier_code, supplier_name, supplier_address))
@@ -515,11 +535,18 @@ def supplier_registration():
 def add_hospital(current_hospital):
     """
     Function to add hospital
-    :param current_hospital: current hospital
+    :param current_hospital: current supplier
     """
     print("Insert hospital {} details".format(current_hospital))
-    hospital_file_object = open("hospitals.txt", "a")
     hospital_code = get_input_hospital_code()
+    while True:
+        is_hospital_exist = check_is_code_exist(hospital_code, "HOSPITAL")
+        if is_hospital_exist:
+            print("Hospital code already exist")
+            hospital_code = get_input_hospital_code()
+        else:
+            break
+    hospital_file_object = open("hospitals.txt", "a")
     hospital_name = get_string_input("Hospital name")
     hospital_address = get_string_input("Hospital address")
     hospital_file_object.write("{},{},{}".format(hospital_code, hospital_name, hospital_address))
@@ -558,6 +585,61 @@ def hospital_registration():
                     continue_ask_confirm = True
                     print("Invalid Input, only accept 0 and 1")
         current_hospital += 1
+
+
+def view_all_supplier():
+    """
+    Function to view all supplier
+    """
+    print("View all suppliers")
+    file_object = open("suppliers.txt", "r")
+    print("-" * 50)
+    print("Suppliers List")
+    print("-" * 50)
+    print("{:<15} {:<15} {:<15}".format("Supplier Code", "Supplier Name", "Supplier Address"))
+    for line in file_object:
+        line = line.rstrip()
+        line = line.split(",")
+        print("{:<15} {:<15} {:<15}".format(line[0], line[1], line[2]))
+    print("-" * 50)
+    file_object.close()
+
+
+def view_all_hospital():
+    """
+    Function to view all hospital
+    """
+    print("View all hospital")
+    file_object = open("hospitals.txt", "r")
+    print()
+    print("-" * 50)
+    print("Hospital List")
+    print("-" * 50)
+    print("{:<15} {:<15} {:<15}".format("Hospital Code", "Hospital Name", "Hospital Address"))
+    for line in file_object:
+        line = line.rstrip()
+        line = line.split(",")
+        print("{:<15} {:<15} {:<15}".format(line[0], line[1], line[2]))
+    print("-" * 50)
+    file_object.close()
+
+
+def view_all_item_based_on_supplier_id(supplier_code):
+    """
+    Function to view all item based on supplier id
+    """
+    print()
+    print("-" * 50)
+    print("View all item based on supplier id")
+    print("-" * 50)
+    file_object = open("ppe.txt", "r")
+    print("{:<15} {:<15} {:<15}".format("Item Code", "Item Name", "Item Quantity"))
+    for line in file_object:
+        line = line.rstrip()
+        line = line.split(",")
+        if line[3] == supplier_code:
+            print("{:<15} {:<15} {:<15}".format(line[0], line[1], line[2]))
+    file_object.close()
 
 
 def main_menu():

@@ -72,6 +72,7 @@ ENDFUNCTION
 FUNCTION update_supplier_details()
   DECLARE File initial_supplier_file_object
   DECLARE String supplier_code_to_save
+  CALL view_all_supplier()
   supplier_code = CALL get_input_supplier_code()
   supplier_new_name = CALL get_string_input("New Supplier Name")
   supplier_new_address = CALL get_string_input("New Supplier Address")
@@ -175,7 +176,9 @@ ENDFUNCTION
 
 
 FUNCTION retrieve_item_history()
+  CALL view_all_supplier()
   supplier_code = CALL get_input_supplier_code()
+  CALL view_all_item_based_on_supplier_id(supplier_code)
   item_code = CALL get_input_item_code(True)
   distribution_file_object = OPENFILE "distribution.txt" FOR READ
   DECLARE List supplier_code_list
@@ -303,7 +306,9 @@ ENDFUNCTION
 
 FUNCTION distribution_process()
   distribution_file_object = OPENFILE "distribution.txt" FOR APPEND
+  CALL view_all_supplier()
   supplier_code = CALL get_input_supplier_code(True)
+  CALL view_all_item_based_on_supplier_id(supplier_code)
   target_hospital_code = CALL get_input_hospital_code(True)
   item_code = get_input_item_code(True)
   quantity_to_distribute = get_number_input("Quantity to distribute")
@@ -385,6 +390,7 @@ ENDFUNCTION
 
 
 FUNCTION view_stock_less_than_twenty_five()
+  CALL view_all_supplier()
   supplier_code = CALL get_input_supplier_code()
   items_list = CALL retrieve_all_based_on_supplier(supplier_code, True)
   IF LENGTH OF items_list > 0 THEN
@@ -396,6 +402,7 @@ ENDFUNCTION
 
 
 FUNCTION view_all_stock()
+  CALL view_all_supplier()
   supplier_code = CALL get_input_supplier_code()
   items_list = CALL retrieve_all_based_on_supplier(supplier_code)
   IF LENGTH OF items_list > 0 THEN
@@ -427,8 +434,13 @@ ENDFUNCTION
 
 
 FUNCTION inventory_creation(flexible_quantity = False)
+  IF not flexible_quantity THEN
+    file_object = OPENFILE "ppe.txt" FOR WRITE
+    CLOSE file_object
+  ENDIF
   continue_add_item = True
   DOWHILE continue_add_item
+    CALL view_all_supplier()
     CALL add_item(flexible_quantity)
     continue_ask_confirm = True
     DOWHILE continue_ask_confirm
@@ -452,8 +464,17 @@ ENDFUNCTION
 
 FUNCTION add_supplier(current_supplier)
   PRINT "Insert supplier", current_supplier,"details"
-  supplier_file_object = OPENFILE "suppliers.txt" FOR APPEND
   supplier_code = CALL get_input_supplier_code()
+  DOWHILE True
+    is_supplier_exist = CALL check_is_code_exist(supplier_code, "SUPPLIER")
+    IF is_supplier_exist == True THEN
+      PRINT "Supplier code already exist"
+      supplier_code = CALL get_input_supplier_code()
+    ELSE
+      BREAK
+    ENDIF
+  ENDDO
+  supplier_file_object = OPENFILE "suppliers.txt" FOR APPEND
   supplier_name = CALL get_string_input("Supplier Name")
   supplier_address = CALL get_string_input("Supplier Address")
   WRITEFILE supplier_file_object, supplier_code, supplier_name, supplier_address
@@ -497,8 +518,17 @@ ENDFUNCTION
 
 FUNCTION add_hospital(current_hospital)
   PRINT "Insert hospital", current_hospital,"details"
+  hospital_code = CALL get_input_hospital_code()
+  DOWHILE True
+    is_hospital_exist = CALL check_is_code_exist(hospital_code, "HOSPITAL")
+    IF is_hospital_exist == True THEN
+      PRINT "Hospital code already exist"
+      hospital_code = CALL get_input_hospital_code()
+    ELSE
+      BREAK
+    ENDIF
+  ENDDO
   hospital_file_object = OPENFILE "hospitals.txt" FOR APPEND
-  hospital_code = CALL get_input_supplier_code()
   hospital_name = CALL get_string_input("Hospital name")
   hospital_address = CALL get_string_input("Hospital address")
   WRITEFILE hospital_file_object, hospital_code, hospital_name, hospital_address
@@ -540,6 +570,49 @@ FUNCTION hospital_registration()
 ENDFUNCTION
 
 
+FUNCTION view_all_supplier()
+  PRINT "View all suppliers"
+  file_object = OPENFILE "hospitals.txt" FOR WRITE
+  PRINT "Suppliers list"
+  PRINT "Supplier Code", "Supplier Name", "Supplier Address"
+  FOREACH line IN file_object
+    line = line.rstrip()
+    line = line.split(",")
+    PRINT line[0], line[1], line[2]
+  ENDFOR
+  CLOSE file_object
+ENDFUNCTION
+
+
+FUNCTION view_all_hospital()
+  PRINT "View all hospital"
+  file_object = OPENFILE "hospitals.txt" FOR WRITE
+  PRINT "Hospital list"
+  PRINT "Hospital Code", "Hospital Name", "Hospital Address"
+  FOREACH line IN file_object
+    line = line.rstrip()
+    line = line.split(",")
+    PRINT line[0], line[1], line[2]
+  ENDFOR
+  CLOSE file_object
+ENDFUNCTION
+
+
+FUNCTION view_all_item_based_on_supplier_id(supplier_code)
+  PRINT "View all item based on supplier id"
+  file_object = OPENFILE "ppe.txt" FOR WRITE
+  PRINT "Item Code", "Item Name", "Item Address"
+  FOREACH line IN file_object
+    line = line.rstrip()
+    line = line.split(",")
+    IF line[3] == supplier_code THEN
+      PRINT line[0], line[1], line[2]
+    ENDIF
+  ENDFOR
+  CLOSE file_object
+ENDFUNCTION
+
+
 FUNCTION main_menu()
   DOWHILE True
     PRINT "Inventory System"
@@ -574,7 +647,7 @@ FUNCTION main_menu()
                   view_stock_less_than_twenty_five()
                 ELSE
                   IF option == 6 THEN
-                    view_stock_less_than_twenty_five()
+                    distribution_module()
                   ELSE
                     IF option == 7 THEN
                       retrieve_item_history()
