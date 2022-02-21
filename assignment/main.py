@@ -77,11 +77,12 @@ def update_supplier_details():
     for initial_supplier_details in initial_supplier_file_object:
         initial_supplier_details = initial_supplier_details.rstrip()
         initial_supplier_details = initial_supplier_details.split(",")
-        supplier_code_to_save = supplier_code
         if initial_supplier_details[0] == supplier_code:
+            supplier_code_to_save = supplier_code
             supplier_name_to_save = supplier_new_name
             supplier_address_to_save = supplier_new_address
         else:
+            supplier_code_to_save = initial_supplier_details[0]
             supplier_name_to_save = initial_supplier_details[1]
             supplier_address_to_save = initial_supplier_details[2]
         initial_supplier_file_object_list.append("{},{},{}".format(supplier_code_to_save, supplier_name_to_save,
@@ -90,9 +91,9 @@ def update_supplier_details():
     temp_supplier_file_object = open("suppliers.txt", "w")
     for initial_supplier_file_item in initial_supplier_file_object_list:
         temp_supplier_file_object.write(initial_supplier_file_item + "\n")
-    temp_supplier_file_object.write(
-        "{},{},{}".format(supplier_code_to_save, supplier_name_to_save, supplier_address_to_save))
-    temp_supplier_file_object.write("\n")
+    # temp_supplier_file_object.write(
+    #     "{},{},{}".format(supplier_code, supplier_name_to_save, supplier_address_to_save))
+    # temp_supplier_file_object.write("\n")
 
     initial_supplier_file_object.close()
     temp_supplier_file_object.close()
@@ -406,7 +407,7 @@ def view_stock_less_than_twenty_five():
     This function will view the stock less than 25 based on supplier code
     """
     view_all_supplier()
-    supplier_code = get_input_supplier_code()
+    supplier_code = get_input_supplier_code(True)
     items_list = retrieve_all_based_on_supplier(supplier_code, True)
     if len(items_list) > 0:
         display_item(items_list)
@@ -419,7 +420,7 @@ def view_all_stock():
     This function will view all the stock
     """
     view_all_supplier()
-    supplier_code = get_input_supplier_code()
+    supplier_code = get_input_supplier_code(True)
     items_list = retrieve_all_based_on_supplier(supplier_code)
     if len(items_list) > 0:
         display_item(items_list)
