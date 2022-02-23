@@ -77,7 +77,7 @@ def update_supplier_details():
     for initial_supplier_details in initial_supplier_file_object:
         initial_supplier_details = initial_supplier_details.rstrip()
         initial_supplier_details = initial_supplier_details.split(",")
-        if initial_supplier_details[0] == supplier_code:
+        if initial_supplier_details[0].lower() == supplier_code.lower():
             supplier_code_to_save = supplier_code
             supplier_name_to_save = supplier_new_name
             supplier_address_to_save = supplier_new_address
@@ -123,7 +123,7 @@ def sort_and_filter_item_search(supplier_code_list, target_hospital_list, quanti
             data2 = target_hospital_list[j]
             data3 = quantity_list[j]
             data4 = item_code_list[j]
-            if data1 == ref1 and data2 == ref2 and data4 == ref4:
+            if data1.lower() == ref1.lower() and data2.lower() == ref2.lower() and data4.lower() == ref4.lower():
                 ref3 += data3
                 supplier_code_list.pop(j)
                 target_hospital_list.pop(j)
@@ -187,7 +187,7 @@ def retrieve_item_history():
     for distribution_details in distribution_file_object:
         distribution_details = distribution_details.rstrip()
         distribution_details = distribution_details.split(",")
-        if distribution_details[2] == item_code:
+        if distribution_details[2].lower() == item_code.lower():
             supplier_code_list.append(distribution_details[0])
             target_hospital_list.append(distribution_details[1])
             item_code_list.append(distribution_details[2])
@@ -210,7 +210,7 @@ def update_stock(supplier_code, item_code, new_quantity, action):
         for initial_item_details in initial_ppe_file_object:
             initial_item_details = initial_item_details.rstrip()
             initial_item_details = initial_item_details.split(",")
-            if initial_item_details[3] == supplier_code and initial_item_details[0] == item_code:
+            if initial_item_details[3].lower() == supplier_code.lower() and initial_item_details[0].lower() == item_code.lower():
                 final_quantity = str(int(initial_item_details[2]) - new_quantity)
             else:
                 final_quantity = initial_item_details[2]
@@ -225,7 +225,7 @@ def update_stock(supplier_code, item_code, new_quantity, action):
         for initial_item_details in initial_ppe_file_object:
             initial_item_details = initial_item_details.rstrip()
             initial_item_details = initial_item_details.split(",")
-            if initial_item_details[3] == supplier_code and initial_item_details[0] == item_code:
+            if initial_item_details[3].lower() == supplier_code.lower() and initial_item_details[0].lower() == item_code.lower():
                 initial_ppe_file_object_list.append("{},{},{},{}".format(initial_item_details[0], initial_item_details[1],
                                       str(int(initial_item_details[2]) + new_quantity), supplier_code))
             else:

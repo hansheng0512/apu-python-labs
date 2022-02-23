@@ -1,0 +1,6 @@
+scode1,hcode1,icode2,23
+scode1,hcode1,icode2,23
+scode1,hcode1,icode2,23
+scode1,hcode1,icode2,23
+scode1,hcode1,icode3,100
+scode1,hcode2,icode3,99
